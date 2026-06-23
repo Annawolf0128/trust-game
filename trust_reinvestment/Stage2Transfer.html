@@ -1,0 +1,41 @@
+{{ block title }}Part 2: round {{ stage2_round }}{{ endblock }}
+
+{{ block content }}
+<p>
+    You have a current-period endowment of {{ endowment }}.
+    Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
+</p>
+{{ if is_reinvestment }}
+<p>
+    You choose how many points to send from the current-period endowment and how
+    many points to use from the Part 2 accumulated account.
+</p>
+<p>
+    amount sent to player 2 = points sent from current-period endowment + points used from Part 2 accumulated account
+</p>
+{{ else }}
+<p>
+    You choose how many points to send from the current-period endowment. Your
+    Part 2 accumulated account balance cannot be used in this round.
+</p>
+<p>
+    amount sent to player 2 = points sent from current-period endowment
+</p>
+{{ endif }}
+<p>
+    amount player 2 receives = amount sent to player 2 x {{ C.MULTIPLIER }}
+</p>
+<p>
+    Player 2 receives the full multiplied amount and then chooses how many
+    points to return to you.
+</p>
+{{ if has_noise }}
+<p>
+    The computer adjustment is then applied to the amount player 2 returns. You
+    see only the final amount that reaches you, not the amount player 2 chose to
+    return.
+</p>
+{{ endif }}
+{{ formfields }}
+{{ next_button }}
+{{ endblock }}

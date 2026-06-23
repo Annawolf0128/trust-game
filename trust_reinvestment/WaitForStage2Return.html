@@ -1,0 +1,10 @@
+{{ block title }}Please Wait{{ endblock }}
+
+{{ block content }}
+{{ if player.id_in_group == 1 }}
+<p>The final amount player 2 received this round is {{ received_amount }}.</p>
+<p>Waiting for player 2's decision.</p>
+{{ else }}
+<p>Waiting for the other player in your pair.</p>
+{{ endif }}
+{{ endblock }}

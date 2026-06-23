@@ -1,0 +1,19 @@
+{{ block title }}Part 2 Quiz{{ endblock }}
+
+{{ block content }}
+<p>
+    Please answer these questions before Part 2 begins.
+</p>
+{{ if has_noise }}
+<p>
+    For the second question, suppose you return 4 points to player 1 this round,
+    and the computer adjustment for this round is x0.5.
+</p>
+{{ else }}
+<p>
+    For the second question, suppose you return 4 points to player 1 this round.
+</p>
+{{ endif }}
+{{ formfields }}
+{{ next_button }}
+{{ endblock }}

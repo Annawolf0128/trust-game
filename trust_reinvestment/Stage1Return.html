@@ -1,0 +1,17 @@
+{{ block title }}Part 1: round {{ stage1_round }} of {{ stage1_rounds }}{{ endblock }}
+
+{{ block content }}
+<p>
+    In this round, player 1 sent <strong>{{ transfer }}</strong> to you.
+    This amount was multiplied by {{ multiplier }}, so you received
+    <strong>{{ multiplied_amount }}</strong>.
+</p>
+<p>
+    You may return any amount from 0 to {{ max_return }} to player 1.
+</p>
+<p>
+    your earnings = multiplied amount you received - points you return to player 1
+</p>
+{{ formfields }}
+{{ next_button }}
+{{ endblock }}

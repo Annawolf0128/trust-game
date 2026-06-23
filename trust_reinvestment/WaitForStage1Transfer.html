@@ -1,0 +1,13 @@
+{{ block title }}Part 1: round {{ stage1_round }} of {{ stage1_rounds }}{{ endblock }}
+
+{{ block content }}
+{{ if player.id_in_group == 2 }}
+<p>
+    This is Part 1 round {{ stage1_round }} of {{ stage1_rounds }}.
+    You are player 2.
+</p>
+<p>Waiting for player 1's decision.</p>
+{{ else }}
+<p>Waiting for player 2.</p>
+{{ endif }}
+{{ endblock }}

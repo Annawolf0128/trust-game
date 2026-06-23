@@ -1,0 +1,18 @@
+{{ block title }}Part 1: round {{ stage1_round }} of {{ stage1_rounds }}{{ endblock }}
+
+{{ block content }}
+<p>
+    You have {{ endowment }} this round.
+</p>
+<p>
+    The amount you send will be multiplied by {{ multiplier }}.
+</p>
+<p>
+    player 2 receives = amount you send x {{ multiplier }}
+</p>
+<p>
+    your earnings = points you keep + points returned by player 2
+</p>
+{{ formfields }}
+{{ next_button }}
+{{ endblock }}

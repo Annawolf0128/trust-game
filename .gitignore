@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+db.sqlite3
+*.otreezip
+_static/
+.Rhistory
+participant_text_review.html
+participant_text_review.md
+participant_text_review_files/

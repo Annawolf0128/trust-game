@@ -1,0 +1,27 @@
+{{ block title }}Part 2 Rules{{ endblock }}
+
+{{ block content }}
+<p>Your pair remains the same. The same rules apply in every Part 2 round.</p>
+<p>
+    In each round, you receive {{ C.ENDOWMENT }} and choose how many points,
+    from 0 to {{ C.ENDOWMENT }}, to send to player 2.
+</p>
+<p>Player 2 receives <strong>three times</strong> the amount you send.</p>
+<p>
+    You and player 2 will see the amount player 2 receives. Player 2 then
+    chooses how many points to return to you.
+</p>
+<p>your earnings = points kept from the current-round endowment + points returned by player 2</p>
+<p>player 2 earnings = amount player 2 receives - points returned to you</p>
+<p>
+    At the end of each round, your earnings from that round are added to your
+    Part 2 accumulated account.
+</p>
+<p>
+    Part 2 lasts for at least {{ min_rounds }} rounds. After round
+    {{ min_rounds }}, at the end of each round there is a {{ stopping_probability }}%
+    chance that Part 2 ends and a {{ continue_probability }}% chance that your
+    pair continues for one more round.
+</p>
+{{ next_button }}
+{{ endblock }}

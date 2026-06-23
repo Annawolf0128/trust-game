@@ -1,0 +1,25 @@
+{{ block title }}Part 2: round {{ stage2_round }}{{ endblock }}
+
+{{ block content }}
+<p>
+    In this round, you received <strong>{{ received_amount }}</strong>.
+</p>
+<p>
+    You may choose how many points to return, from 0 to {{ max_return }}.
+</p>
+{{ if has_noise }}
+<p>
+    The computer applies a random adjustment to the amount you return, and
+    player 1 receives the adjusted amount.
+</p>
+{{ else }}
+<p>
+    player 1 receives = return chosen by you
+</p>
+{{ endif }}
+<p>
+    your earnings = amount you received - return chosen by you
+</p>
+{{ formfields }}
+{{ next_button }}
+{{ endblock }}

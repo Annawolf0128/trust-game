@@ -1,0 +1,38 @@
+{{ block title }}Part 2 Rules{{ endblock }}
+
+{{ block content }}
+<p>Your pair remains the same. The same rules apply in every Part 2 round.</p>
+<p>
+    In each round, player 1 chooses how many points to send to you. Player 1
+    may send points from a current-round endowment of {{ C.ENDOWMENT }} and from
+    player 1's Part 2 accumulated account.
+</p>
+<p>
+    The total amount player 1 sends is multiplied by {{ C.MULTIPLIER }}, and you
+    receive the full multiplied amount. You then choose how many points to
+    return to player 1. The computer applies a random adjustment to the amount
+    you return before it reaches player 1:
+</p>
+<ul>
+    <li>80% chance: amount that reaches player 1 = amount you return</li>
+    <li>10% chance: amount that reaches player 1 = amount you return x 0.5</li>
+    <li>10% chance: amount that reaches player 1 = amount you return x 1.5</li>
+</ul>
+<p>player 1 earnings = points player 1 keeps from the endowment + amount that reaches player 1</p>
+<p>your earnings = amount you receive - points you return to player 1</p>
+<p>
+    At the end of each round, your earnings from that round are added to your
+    Part 2 accumulated account.
+</p>
+<p>
+    Player 1 sees only the final amount that reaches them after the computer
+    adjustment, not the amount you chose to return.
+</p>
+<p>
+    Part 2 lasts for at least {{ min_rounds }} rounds. After round
+    {{ min_rounds }}, at the end of each round there is a {{ stopping_probability }}%
+    chance that Part 2 ends and a {{ continue_probability }}% chance that your
+    pair continues for one more round.
+</p>
+{{ next_button }}
+{{ endblock }}

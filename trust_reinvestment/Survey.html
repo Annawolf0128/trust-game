@@ -1,0 +1,19 @@
+{{ block title }}Final Survey{{ endblock }}
+
+{{ block content }}
+<p>
+    Please answer a few final questions. Your answers are confidential and do
+    not affect your payment.
+</p>
+
+<h4>Background</h4>
+{{ formfield 'gender' }}
+{{ formfield 'age' }}
+
+<h4>Preferences</h4>
+{{ formfield 'risk_preference' }}
+{{ formfield 'trust_most_people' }}
+{{ formfield 'trust_willingness' }}
+
+{{ next_button }}
+{{ endblock }}

@@ -1,0 +1,34 @@
+{{ block title }}Part 1 Rules{{ endblock }}
+
+{{ block content }}
+<p>
+    Part 1 has {{ C.STAGE1_ROUNDS }} rounds. The same rules apply in every
+    Part 1 round.
+</p>
+<p>
+    In each round, you receive {{ C.ENDOWMENT }} and choose how many points,
+    from 0 to {{ C.ENDOWMENT }}, to send to player 2.
+</p>
+<p>
+    Player 2 receives <strong>three times</strong> the amount you send. After receiving
+    this amount, player 2 chooses how many points to return to you.
+</p>
+<p>
+    In each round, earnings are calculated as follows:
+</p>
+<p>
+    your earnings = points kept from the endowment + points returned by player 2
+</p>
+<p>
+    player 2 earnings = amount player 2 receives - points returned to you
+</p>
+<p>
+    At the end of each round, your earnings from that round are added to your
+    Part 1 accumulated account.
+</p>
+<p>
+    In each round, each player will see the other player's decision
+    and both players' earnings for that round.
+</p>
+{{ next_button }}
+{{ endblock }}

@@ -16,7 +16,7 @@ in the config, every cell is shown in sequence.
 
 
 class C(BaseConstants):
-    NAME_IN_URL = "preview"
+    NAME_IN_URL = "preview_part2"
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
 

@@ -72,9 +72,11 @@ The project contains three oTree apps:
 
 - **`trust_reinvestment`** — the full experiment (Stage 1 + Stage 2 + survey). This
   is the app real participants play.
-- **`preview`** — a single-player walkthrough of Stage 2 (Part 2 instruction pages,
-  send/return decisions, both results screens) plus the survey. No partner, no
-  waiting. Used to review the participant-facing text of one or all cells.
+- **`preview_part2`** — a single-player walkthrough of Stage 2 (Part 2 instruction
+  pages, send/return decisions, both results screens) plus the survey. No partner,
+  no waiting. Used to review the participant-facing text of one or all cells. It
+  reuses the real `trust_reinvestment` templates, so the text is always identical
+  to the official session.
 - **`preview_part1`** — a single-player click-through of every Part 1 page (intro,
   role assignment, rules, quizzes, send/return, results). Used to review Part 1
   text. No partner, no waiting.

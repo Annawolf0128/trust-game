@@ -4,7 +4,8 @@ __pycache__/
 .DS_Store
 db.sqlite3
 *.otreezip
-_static/
+_static/*
+!_static/.gitkeep
 .Rhistory
 participant_text_review.html
 participant_text_review.md

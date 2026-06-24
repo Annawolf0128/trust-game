@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Trust Game — 页面流程与文案</title>
+<title>Trust Game — Page Flow & Text</title>
 <style>
   :root{
     --ink:#1d2330; --muted:#5d6675; --line:#e2e6ee; --bg:#f6f8fb;
@@ -11,7 +11,7 @@
     --codebg:#0f172a; --codeink:#e6edf6;
   }
   *{box-sizing:border-box}
-  body{font-family:-apple-system,"PingFang SC","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--ink); line-height:1.65; margin:0; background:#fff;}
   .wrap{max-width:980px; margin:0 auto; padding:40px 28px 80px;}
   h1{font-size:30px; margin:0 0 6px;}
@@ -61,86 +61,86 @@
 <body>
 <div class="wrap">
 
-<h1>Trust Game — 实验页面流程与文案</h1>
-<p class="lede">本文件记录 oTree 实验（<code>trust_reinvestment</code> app）里每名玩家在每个 cell 中经过的全部页面，以及每页的英文原文。讲解为中文，页面文字按模板原文照抄（保留 <code>{{ }}</code> 占位符；实际取值见下方图例）。</p>
+<h1>Trust Game — Page Flow &amp; Text</h1>
+<p class="lede">This document records, for the oTree experiment (<code>trust_reinvestment</code> app), every page each player sees in each cell, together with the verbatim English text of each page. Page text is copied straight from the templates (<code>{{ }}</code> placeholders preserved; the actual values used in this configuration are in the legend below).</p>
 
 <div class="legend">
-  <b>占位符实际取值（本配置）</b>
+  <b>Placeholder values (this configuration)</b>
   <table>
-    <tr><td>{{ C.ENDOWMENT }}</td><td>每轮初始禀赋 = <b>10 points</b></td></tr>
-    <tr><td>{{ C.MULTIPLIER }}</td><td>发送金额的放大倍数 = <b>3</b></td></tr>
-    <tr><td>{{ C.STAGE1_ROUNDS }}</td><td>Part 1 轮数 = <b>3</b></td></tr>
-    <tr><td>{{ min_rounds }}</td><td>Part 2 最少轮数 = <b>5</b></td></tr>
-    <tr><td>{{ stopping_probability }} / {{ continue_probability }}</td><td>第 5 轮后每轮停止 = <b>15%</b> / 继续 = <b>85%</b>（硬上限 24 轮，NUM_ROUNDS=27）</td></tr>
-    <tr><td>{{ payment_rate }}</td><td>每点折算 = <b>$0.10</b></td></tr>
+    <tr><td>{{ C.ENDOWMENT }}</td><td>Per-round endowment = <b>10 points</b></td></tr>
+    <tr><td>{{ C.MULTIPLIER }}</td><td>Multiplier on the amount sent = <b>3</b></td></tr>
+    <tr><td>{{ C.STAGE1_ROUNDS }}</td><td>Part 1 rounds = <b>3</b></td></tr>
+    <tr><td>{{ min_rounds }}</td><td>Part 2 minimum rounds = <b>5</b></td></tr>
+    <tr><td>{{ stopping_probability }} / {{ continue_probability }}</td><td>After round 5, each round stops = <b>15%</b> / continues = <b>85%</b> (hard cap 24 rounds, NUM_ROUNDS=27)</td></tr>
+    <tr><td>{{ payment_rate }}</td><td>Per-point conversion = <b>$0.10</b></td></tr>
   </table>
-  <p class="small" style="margin-top:8px;">角色：<span class="tag t-p1">player 1 / A</span>＝信任者（truster，先发送）；<span class="tag t-p2">player 2 / B</span>＝受托者（trustee，后返还）。配对在全程固定。</p>
+  <p class="small" style="margin-top:8px;">Roles: <span class="tag t-p1">player 1 / A</span> = truster (sends first); <span class="tag t-p2">player 2 / B</span> = trustee (returns afterward). Pairs are fixed throughout.</p>
 </div>
 
 <div class="legend">
-  <b>目录</b>
+  <b>Contents</b>
   <div class="toc">
-    <a href="#logic">一、整体页面逻辑</a><br>
-    <a href="#shared1">二、共享页面（Part 1 + Stage 1，所有 cell 相同）</a><br>
-    <a href="#cells">三、四个 Cell 的 Part 2 页面</a><br>
+    <a href="#logic">1. Overall page logic</a><br>
+    <a href="#shared1">2. Shared pages (Part 1 + Stage 1, identical across cells)</a><br>
+    <a href="#cells">3. Part 2 pages for the four cells</a><br>
     <a href="#c1">　Cell 1 · no_reinvestment × no_noise</a><br>
     <a href="#c2">　Cell 2 · no_reinvestment × noise</a><br>
     <a href="#c3">　Cell 3 · reinvestment × no_noise</a><br>
     <a href="#c4">　Cell 4 · reinvestment × noise</a><br>
-    <a href="#shared2">四、结尾共享页面（问卷 + 结算）</a><br>
+    <a href="#shared2">4. Closing shared pages (survey + settlement)</a><br>
   </div>
 </div>
 
-<!-- ============ 一、整体逻辑 ============ -->
-<h2 id="logic">一、整体页面逻辑</h2>
+<!-- ============ 1. Overall logic ============ -->
+<h2 id="logic">1. Overall page logic</h2>
 
-<p>所有玩家共用同一条 <code>page_sequence</code>（页面序列），每页用 <code>is_displayed</code> 决定对谁、在哪一轮显示。实验在同一套页面里跑 <b>27 轮</b>：第 1–3 轮是 Part 1，第 4–27 轮是 Part 2（含随机停止）。一名玩家实际看到的页面，是这条序列里所有"对他可见"的页面。</p>
+<p>All players share a single <code>page_sequence</code>, and each page uses <code>is_displayed</code> to decide who sees it and in which round. The experiment runs <b>27 rounds</b> through this one sequence: rounds 1–3 are Part 1, rounds 4–27 are Part 2 (with random stopping). The pages a given player actually sees are all the pages in this sequence that are "visible to them."</p>
 
 <div class="flow">
-<b>1. 开场（仅第 1 轮出现一次）</b>
+<b>1. Opening (appears once, round 1 only)</b>
 <ol>
-  <li><span class="tag t-both">两人</span> Introduction → RoleAssignment</li>
-  <li>按角色分叉：<span class="tag t-p1">A</span> 看 Part1InstructionsP1 + Part1QuizP1；<span class="tag t-p2">B</span> 看 Part1InstructionsP2 + Part1QuizP2</li>
+  <li><span class="tag t-both">Both</span> Introduction → RoleAssignment</li>
+  <li>Branch by role: <span class="tag t-p1">A</span> sees Part1InstructionsP1 + Part1QuizP1; <span class="tag t-p2">B</span> sees Part1InstructionsP2 + Part1QuizP2</li>
 </ol>
 
-<b>2. Part 1 / Stage 1（第 1–3 轮，每轮重复，所有 cell 文字相同）</b>
+<b>2. Part 1 / Stage 1 (rounds 1–3, repeated each round, identical text across all cells)</b>
 <ol>
-  <li><span class="tag t-p1">A</span> 在 Stage1Transfer 选择发送额 → B 此时在等待页</li>
-  <li><span class="tag t-p2">B</span> 在 Stage1Return 选择返还额 → A 此时在等待页</li>
-  <li><span class="tag t-both">两人</span> 看 Stage1Results（双方决策与本轮收益，记入 Part 1 账户）</li>
+  <li><span class="tag t-p1">A</span> chooses an amount to send on Stage1Transfer → B is on a wait page</li>
+  <li><span class="tag t-p2">B</span> chooses an amount to return on Stage1Return → A is on a wait page</li>
+  <li><span class="tag t-both">Both</span> see Stage1Results (both decisions and round payoffs, added to the Part 1 account)</li>
 </ol>
 
-<b>3. 进入 Part 2（仅第 4 轮，即 STAGE1_ROUNDS+1）</b>
+<b>3. Entering Part 2 (round 4 only, i.e. STAGE1_ROUNDS+1)</b>
 <ol>
-  <li><span class="tag t-both">两人</span> Stage2SetupWait（同步等待页，此处系统按 Stage 1 关系质量把各对分层分到四个 cell）</li>
-  <li>按 <b>cell × 角色</b>分叉：每人只看到本 cell、本角色的那一张 Part 2 规则页（共 8 张里取 1 张）</li>
-  <li>按角色：<span class="tag t-p1">A</span> 看 Stage2QuizP1；<span class="tag t-p2">B</span> 看 Stage2QuizP2</li>
+  <li><span class="tag t-both">Both</span> Stage2SetupWait (synchronizing wait page; here the system stratifies each pair by Stage 1 relationship quality and assigns it to one of the four cells)</li>
+  <li>Branch by <b>cell × role</b>: each person sees only the single Part 2 rules page for their cell and role (1 of 8)</li>
+  <li>By role: <span class="tag t-p1">A</span> sees Stage2QuizP1; <span class="tag t-p2">B</span> sees Stage2QuizP2</li>
 </ol>
 
-<b>4. Part 2 决策轮（第 4–27 轮，每轮重复，按随机停止可能提前结束）</b>
+<b>4. Part 2 decision rounds (rounds 4–27, repeated each round, may end early by random stopping)</b>
 <ol>
-  <li>第 5 轮起，每轮先有 Stage2StateWait 同步页（第 4 轮没有）</li>
-  <li><span class="tag t-p1">A</span> 在 Stage2Transfer 发送（reinvestment cell 多一个"动用账户"字段）+ 报告对 B 返还的信念 → B 在等待页</li>
-  <li><span class="tag t-p2">B</span> 在 Stage2Return 返还 + 报告对 A 发送额的信念 → A 在等待页</li>
-  <li><span class="tag t-both">两人</span> 看 Stage2Results（noise cell 下，仅 <span class="tag t-p1">A</span> 在此页多答一道 signal_attribution 归因题）</li>
-  <li>页面底部提示本对是"继续"还是"已停止"</li>
+  <li>From round 5 on, each round begins with a Stage2StateWait sync page (round 4 has none)</li>
+  <li><span class="tag t-p1">A</span> sends on Stage2Transfer (reinvestment cells add an "use accumulated account" field) + reports a belief about B's return → B is on a wait page</li>
+  <li><span class="tag t-p2">B</span> returns on Stage2Return + reports a belief about A's transfer → A is on a wait page</li>
+  <li><span class="tag t-both">Both</span> see Stage2Results (under noise cells, only <span class="tag t-p1">A</span> answers an extra signal_attribution question on this page)</li>
+  <li>The bottom of the page indicates whether the pair "continues" or "has stopped"</li>
 </ol>
 
-<b>5. 收尾（仅最后一轮，第 27 轮）</b>
+<b>5. Closing (final round only, round 27)</b>
 <ol>
-  <li><span class="tag t-both">两人</span> Survey（人口学 + 偏好问卷）→ FinalResults（两账户合计结算）</li>
+  <li><span class="tag t-both">Both</span> Survey (demographics + preferences) → FinalResults (settlement of the two accounts combined)</li>
 </ol>
 </div>
 
-<p class="small"><b>关键点：</b>四个 cell 之间唯一不同的是 <b>Part 2</b>——具体只差在 Part 2 规则页、Part 2 quiz、Part 2 的发送/返还/结果页这几处文字与字段。Part 1、Stage 1、问卷、结算对所有 cell 完全一致。下面第二节先一次性写完共享页面，第三节按 cell 只写 Part 2 的差异。</p>
+<p class="small"><b>Key point:</b> the only difference between the four cells is <b>Part 2</b> — specifically the Part 2 rules page, the Part 2 quiz, and the Part 2 send/return/results pages (text and fields). Part 1, Stage 1, the survey, and the settlement are identical across all cells. Section 2 below writes out the shared pages once; Section 3 covers only the Part 2 differences, cell by cell.</p>
 
-<!-- ============ 二、共享页面 ============ -->
-<h2 id="shared1">二、共享页面（Part 1 + Stage 1 · 所有 cell 相同）</h2>
+<!-- ============ 2. Shared pages ============ -->
+<h2 id="shared1">2. Shared pages (Part 1 + Stage 1 · identical across cells)</h2>
 
-<h3>开场（仅第 1 轮）</h3>
+<h3>Opening (round 1 only)</h3>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-both">两人</span>Introduction<span class="fname">Introduction.html</span></div>
+  <div class="head"><span class="tag t-both">Both</span>Introduction<span class="fname">Introduction.html</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Decision Task</span>You will be randomly matched with another player. You will also be randomly assigned a role: player 1 or player 2. Your matched player and your role will remain the same throughout the experiment.
 
@@ -151,7 +151,7 @@ Your earnings from Part 1 and Part 2 will be kept in two separate accumulated ac
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-both">两人</span>RoleAssignment<span class="fname">RoleAssignment.html</span></div>
+  <div class="head"><span class="tag t-both">Both</span>RoleAssignment<span class="fname">RoleAssignment.html</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Your Role</span>You have been assigned to the role of player {{ role_number }}.
 
@@ -205,7 +205,7 @@ In each round, each player will see the other player's decision and both players
   <div class="head"><span class="tag t-p1">A</span>Part1QuizP1<span class="fname">Part1QuizP1.html</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 1 Quiz</span>Please answer these questions before Part 1 begins.</div>
-    <p class="note">表单字段：</p>
+    <p class="note">Form fields:</p>
     <div class="field">part1_quiz_p1_multiplied — "If you send 4 points in Part 1, how many points does player 2 receive?"</div>
     <div class="field">part1_quiz_p1_payoff — "If you send 4 points and player 2 returns 5 points, how many points do you earn in that round?"</div>
   </div>
@@ -215,13 +215,13 @@ In each round, each player will see the other player's decision and both players
   <div class="head"><span class="tag t-p2">B</span>Part1QuizP2<span class="fname">Part1QuizP2.html</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 1 Quiz</span>Please answer these questions before Part 1 begins.</div>
-    <p class="note">表单字段：</p>
+    <p class="note">Form fields:</p>
     <div class="field">part1_quiz_p2_received — "If player 1 sends 4 points to you in Part 1, how many points do you receive?"</div>
     <div class="field">part1_quiz_p2_payoff — "If player 1 sends 4 points to you and you return 5 points, how many points do you earn in that round?"</div>
   </div>
 </div>
 
-<h3>Stage 1 决策轮（第 1–3 轮，每轮重复）</h3>
+<h3>Stage 1 decision rounds (rounds 1–3, repeated each round)</h3>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Stage1Transfer<span class="fname">Stage1Transfer.html</span></div>
@@ -233,7 +233,7 @@ The amount you send will be multiplied by {{ multiplier }}.
 player 2 receives = amount you send x {{ multiplier }}
 
 your earnings = points you keep + points returned by player 2</div>
-    <div class="field">transfer — "Amount to send"（0 到禀赋之间）</div>
+    <div class="field">transfer — "Amount to send" (between 0 and the endowment)</div>
   </div>
 </div>
 
@@ -250,14 +250,14 @@ your earnings = multiplied amount you received - points you return to player 1</
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-both">两人</span>Stage1Results<span class="fname">Stage1Results.html</span><span class="small">（按角色显示不同分支）</span></div>
+  <div class="head"><span class="tag t-both">Both</span>Stage1Results<span class="fname">Stage1Results.html</span><span class="small">(different branch shown by role)</span></div>
   <div class="body">
-    <p class="note">A 看到的分支（view_as_p1）：</p>
+    <p class="note">Branch A sees (view_as_p1):</p>
     <div class="verbatim"><span class="ttl">Part 1 Results</span>You sent {{ player.transfer }} and player 2 returned {{ player.realized_return }}.
 Your payoff this round is {{ player.round_payoff }}.
 Player 2's payoff this round is {{ partner.round_payoff }}.
 Your Part 1 accumulated account balance is now {{ account_balance }}.</div>
-    <p class="note">B 看到的分支：</p>
+    <p class="note">Branch B sees:</p>
     <div class="verbatim"><span class="ttl">Part 1 Results</span>In this round, player 1 sent {{ partner.transfer }}. You returned {{ player.intended_return }}.
 Your payoff this round is {{ player.round_payoff }}.
 Player 1's payoff this round is {{ partner.round_payoff }}.
@@ -266,35 +266,35 @@ Your Part 1 accumulated account balance is now {{ account_balance }}.</div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-wait">等待页</span>Stage 1 同步页<span class="fname">WaitForStage1Transfer / WaitForStage1Return.html</span></div>
+  <div class="head"><span class="tag t-wait">Wait</span>Stage 1 sync pages<span class="fname">WaitForStage1Transfer / WaitForStage1Return.html</span></div>
   <div class="body">
-    <p class="note">WaitForStage1Transfer（B 看到 / A 看到 else 分支）：</p>
+    <p class="note">WaitForStage1Transfer (B sees / A sees the else branch):</p>
     <div class="verbatim">[B] This is Part 1 round {{ stage1_round }} of {{ stage1_rounds }}. You are player 2.
 Waiting for player 1's decision.
 [A] Waiting for player 2.</div>
-    <p class="note">WaitForStage1Return：</p>
+    <p class="note">WaitForStage1Return:</p>
     <div class="verbatim">Waiting for the other player in your pair.</div>
   </div>
 </div>
 
-<!-- ============ 三、四个 cell 的 Part 2 ============ -->
-<h2 id="cells">三、四个 Cell 的 Part 2 页面</h2>
-<p class="small">下面每个 cell 先给出 <span class="tag t-p1">A</span> 和 <span class="tag t-p2">B</span> 在 Part 2 里的完整页面路径（开场与 Stage 1 同上节），再列出该 cell 专属的页面原文。发送/返还/结果页含条件分支，这里只展示该 cell 实际渲染的那一支。</p>
+<!-- ============ 3. Part 2 for the four cells ============ -->
+<h2 id="cells">3. Part 2 pages for the four cells</h2>
+<p class="small">For each cell below, the full Part 2 page path for <span class="tag t-p1">A</span> and <span class="tag t-p2">B</span> is given first (the opening and Stage 1 are the same as the previous section), followed by the cell-specific verbatim page text. The send/return/results pages contain conditional branches; only the branch actually rendered for that cell is shown.</p>
 
 <!-- ===== Cell 1 ===== -->
 <div class="cellhdr" id="c1">
   <div class="n">Cell 1</div>
   <div class="t">no_reinvestment × no_noise</div>
-  <div class="small">不可再投资 · 无噪声。最干净的重复信任博弈：A 不能动用账户余额，B 的返还原样到达 A。</div>
+  <div class="small">No reinvestment · no noise. The cleanest repeated trust game: A cannot draw on the account balance, and B's return reaches A unchanged.</div>
 </div>
 
-<div class="chips"><b>A 的 Part 2 路径：</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [每轮：(第5轮起)Stage2StateWait <span class="arrow">→</span> Stage2Transfer <span class="arrow">→</span> 等待 <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
-<div class="chips"><b>B 的 Part 2 路径：</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [每轮：(第5轮起)Stage2StateWait <span class="arrow">→</span> 等待 <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="chips"><b>A's Part 2 path:</b></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="chips"><b>B's Part 2 path:</b></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Part 2 规则页<span class="fname">Stage2InstructionsNoReinvestmentNoNoiseP1.html</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Part 2 rules<span class="fname">Stage2InstructionsNoReinvestmentNoNoiseP1.html</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2 Rules</span>Your pair remains the same. The same rules apply in every Part 2 round.
 
 In each round, you receive {{ C.ENDOWMENT }} and choose how many points, from 0 to {{ C.ENDOWMENT }}, to send to player 2.
@@ -312,7 +312,7 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Part 2 规则页<span class="fname">Stage2InstructionsNoReinvestmentNoNoiseP2.html</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Part 2 rules<span class="fname">Stage2InstructionsNoReinvestmentNoNoiseP2.html</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2 Rules</span>Your pair remains the same. The same rules apply in every Part 2 round.
 
 In each round, player 1 receives {{ C.ENDOWMENT }} and chooses how many points to send to you.
@@ -330,29 +330,29 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html（no-noise 分支）</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html (no-noise branch)</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
 
 For the second question, suppose player 2 returns 4 points to you this round.</div>
-    <div class="field">part2_quiz_p1_account — "In your Part 2 rules, can you use points from your accumulated account in the current round?"（Yes / No；本 cell 正确答案 No）</div>
+    <div class="field">part2_quiz_p1_account — "In your Part 2 rules, can you use points from your accumulated account in the current round?" (Yes / No; correct answer in this cell: No)</div>
     <div class="field">part2_quiz_p1_realized_return — "How many points reach you?"</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html（no-noise 分支）</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html (no-noise branch)</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
 
 For the second question, suppose you return 4 points to player 1 this round.</div>
-    <div class="field">part2_quiz_p2_account — "In your Part 2 rules, can the points sent to you include points from player 1's accumulated account?"（Yes / No；本 cell 正确答案 No）</div>
+    <div class="field">part2_quiz_p2_account — "In your Part 2 rules, can the points sent to you include points from player 1's accumulated account?" (Yes / No; correct answer in this cell: No)</div>
     <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?"</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html（no-reinvestment / no-noise 分支）</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html (no-reinvestment / no-noise branch)</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>You have a current-period endowment of {{ endowment }}. Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
 
 You choose how many points to send from the current-period endowment. Your Part 2 accumulated account balance cannot be used in this round.
@@ -368,7 +368,7 @@ Player 2 receives the full multiplied amount and then chooses how many points to
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html（no-noise 分支）</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (no-noise branch)</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>In this round, you received {{ received_amount }}.
 
 You may choose how many points to return, from 0 to {{ max_return }}.
@@ -382,22 +382,22 @@ your earnings = amount you received - return chosen by you</div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-both">两人</span>Stage2Results<span class="fname">Stage2Results.html（no-reinvestment / no-noise）</span></div>
+  <div class="head"><span class="tag t-both">Both</span>Stage2Results<span class="fname">Stage2Results.html (no-reinvestment / no-noise)</span></div>
   <div class="body">
-    <p class="note">A 看到的分支：</p>
+    <p class="note">Branch A sees:</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>You sent {{ player.transfer }} from the current endowment.
 The amount player 2 received was {{ received_amount }}.
 The amount that reached you from player 2 this round was {{ realized_return }}.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
-[结尾二选一] The interaction continues to another round. / The interaction has stopped.</div>
-    <p class="note">B 看到的分支：</p>
+[one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
+    <p class="note">Branch B sees:</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>The final amount you received was {{ player.received_amount }}.
 You returned {{ player.intended_return }} to player 1.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
-[结尾二选一] The interaction continues to another round. / The interaction has stopped.</div>
-    <p class="small">本 cell 无噪声：两人在此页都不作答（无 signal_attribution 字段）。</p>
+[one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
+    <p class="small">No noise in this cell: neither player answers anything on this page (no signal_attribution field).</p>
   </div>
 </div>
 
@@ -405,16 +405,16 @@ Your Part 2 accumulated account balance is now {{ account_balance }}.
 <div class="cellhdr" id="c2">
   <div class="n">Cell 2</div>
   <div class="t">no_reinvestment × noise</div>
-  <div class="small">不可再投资 · 有噪声。B 的返还被计算机做均值不变的随机调整后才到达 A；A 只看到最终到账额，看不到 B 的实际返还与调整系数 → 归因模糊落在 A 身上。</div>
+  <div class="small">No reinvestment · noise. B's return is randomly adjusted (mean-preserving) by the computer before it reaches A; A sees only the final amount received, not B's actual return nor the adjustment factor → attribution ambiguity sits on A.</div>
 </div>
 
-<div class="chips"><b>A 的 Part 2 路径：</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [每轮：(第5轮起)Stage2StateWait <span class="arrow">→</span> Stage2Transfer <span class="arrow">→</span> 等待 <span class="arrow">→</span> Stage2Results<b>（答归因题）</b>] <span class="arrow">→ …</span></div>
-<div class="chips"><b>B 的 Part 2 路径：</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [每轮：(第5轮起)Stage2StateWait <span class="arrow">→</span> 等待 <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="chips"><b>A's Part 2 path:</b></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results<b> (answers attribution question)</b>] <span class="arrow">→ …</span></div>
+<div class="chips"><b>B's Part 2 path:</b></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Part 2 规则页<span class="fname">Stage2InstructionsNoReinvestmentNoiseP1.html</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Part 2 rules<span class="fname">Stage2InstructionsNoReinvestmentNoiseP1.html</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2 Rules</span>Your pair remains the same. The same rules apply in every Part 2 round.
 
 In each round, you receive {{ C.ENDOWMENT }} and choose how many points, from 0 to {{ C.ENDOWMENT }}, to send to player 2.
@@ -432,7 +432,7 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Part 2 规则页<span class="fname">Stage2InstructionsNoReinvestmentNoiseP2.html</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Part 2 rules<span class="fname">Stage2InstructionsNoReinvestmentNoiseP2.html</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2 Rules</span>Your pair remains the same. The same rules apply in every Part 2 round.
 
 In each round, player 1 chooses how many points to send to you. The amount player 1 sends is multiplied by {{ C.MULTIPLIER }}, and you receive the full multiplied amount. You then choose how many points to return to player 1. The computer applies a random adjustment to the amount you return before it reaches player 1:
@@ -448,29 +448,29 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html（noise 分支）</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html (noise branch)</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
 
 For the second question, suppose player 2 returns 4 points to you this round, and the computer adjustment for this round is x0.5.</div>
-    <div class="field">part2_quiz_p1_account — "…can you use points from your accumulated account…?"（正确答案 No）</div>
-    <div class="field">part2_quiz_p1_realized_return — "How many points reach you?"（noise×0.5 → 正确答案 2）</div>
+    <div class="field">part2_quiz_p1_account — "…can you use points from your accumulated account…?" (correct answer: No)</div>
+    <div class="field">part2_quiz_p1_realized_return — "How many points reach you?" (noise ×0.5 → correct answer: 2)</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html（noise 分支）</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html (noise branch)</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
 
 For the second question, suppose you return 4 points to player 1 this round, and the computer adjustment for this round is x0.5.</div>
-    <div class="field">part2_quiz_p2_account — "…can the points sent to you include points from player 1's accumulated account?"（正确答案 No）</div>
-    <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?"（正确答案 2）</div>
+    <div class="field">part2_quiz_p2_account — "…can the points sent to you include points from player 1's accumulated account?" (correct answer: No)</div>
+    <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?" (correct answer: 2)</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html（no-reinvestment / noise 分支）</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html (no-reinvestment / noise branch)</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>You have a current-period endowment of {{ endowment }}. Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
 
 You choose how many points to send from the current-period endowment. Your Part 2 accumulated account balance cannot be used in this round.
@@ -488,7 +488,7 @@ The computer adjustment is then applied to the amount player 2 returns. You see 
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html（noise 分支）</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (noise branch)</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>In this round, you received {{ received_amount }}.
 
 You may choose how many points to return, from 0 to {{ max_return }}.
@@ -502,22 +502,22 @@ your earnings = amount you received - return chosen by you</div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-both">两人</span>Stage2Results<span class="fname">Stage2Results.html（no-reinvestment / noise）</span></div>
+  <div class="head"><span class="tag t-both">Both</span>Stage2Results<span class="fname">Stage2Results.html (no-reinvestment / noise)</span></div>
   <div class="body">
-    <p class="note">A 看到的分支（noise 下 A 多答一道归因题）：</p>
+    <p class="note">Branch A sees (under noise, A answers an extra attribution question):</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>You sent {{ player.transfer }} from the current endowment.
 The amount player 2 received was {{ received_amount }}.
 The amount that reached you from player 2 this round was {{ realized_return }}.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
-[结尾二选一] The interaction continues to another round. / The interaction has stopped.</div>
-    <div class="field">signal_attribution（仅 A、仅 noise）— "To what extent did the amount that reached you reflect player 2's chosen return rather than the computer adjustment? (0 - entirely the computer adjustment, 10 - entirely player 2's choice)"</div>
-    <p class="note">B 看到的分支（无作答字段）：</p>
+[one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
+    <div class="field">signal_attribution (A only, noise only) — "To what extent did the amount that reached you reflect player 2's chosen return rather than the computer adjustment? (0 - entirely the computer adjustment, 10 - entirely player 2's choice)"</div>
+    <p class="note">Branch B sees (no answer field):</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>The final amount you received was {{ player.received_amount }}.
 You returned {{ player.intended_return }} to player 1.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
-[结尾二选一] The interaction continues to another round. / The interaction has stopped.</div>
+[one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
   </div>
 </div>
 
@@ -525,16 +525,16 @@ Your Part 2 accumulated account balance is now {{ account_balance }}.
 <div class="cellhdr" id="c3">
   <div class="n">Cell 3</div>
   <div class="t">reinvestment × no_noise</div>
-  <div class="small">可再投资 · 无噪声。A 除当期禀赋外，还能动用 Part 2 累积账户里的点数发送给同一个 B；B 的返还原样到达。</div>
+  <div class="small">Reinvestment · no noise. Besides the current-period endowment, A can also draw points from the Part 2 accumulated account to send to the same B; B's return arrives unchanged.</div>
 </div>
 
-<div class="chips"><b>A 的 Part 2 路径：</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [每轮：(第5轮起)Stage2StateWait <span class="arrow">→</span> Stage2Transfer<b>（多 reinvestment 字段）</b> <span class="arrow">→</span> 等待 <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
-<div class="chips"><b>B 的 Part 2 路径：</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [每轮：(第5轮起)Stage2StateWait <span class="arrow">→</span> 等待 <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="chips"><b>A's Part 2 path:</b></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer<b> (extra reinvestment field)</b> <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="chips"><b>B's Part 2 path:</b></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Part 2 规则页<span class="fname">Stage2InstructionsReinvestmentNoNoiseP1.html</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Part 2 rules<span class="fname">Stage2InstructionsReinvestmentNoNoiseP1.html</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2 Rules</span>Your pair remains the same. The same rules apply in every Part 2 round.
 
 In each round, you receive a {{ C.ENDOWMENT }} endowment. You may send points to player 2 from this endowment and from your Part 2 accumulated account.
@@ -554,7 +554,7 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Part 2 规则页<span class="fname">Stage2InstructionsReinvestmentNoNoiseP2.html</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Part 2 rules<span class="fname">Stage2InstructionsReinvestmentNoNoiseP2.html</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2 Rules</span>Your pair remains the same. The same rules apply in every Part 2 round.
 
 In each round, player 1 chooses how many points to send to you. Player 1 may send points from a current-round endowment of {{ C.ENDOWMENT }} and from player 1's Part 2 accumulated account.
@@ -572,29 +572,29 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html（no-noise 分支）</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html (no-noise branch)</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
 
 For the second question, suppose player 2 returns 4 points to you this round.</div>
-    <div class="field">part2_quiz_p1_account — "…can you use points from your accumulated account…?"（本 cell 正确答案 Yes）</div>
-    <div class="field">part2_quiz_p1_realized_return — "How many points reach you?"（无噪声 → 正确答案 4）</div>
+    <div class="field">part2_quiz_p1_account — "…can you use points from your accumulated account…?" (correct answer in this cell: Yes)</div>
+    <div class="field">part2_quiz_p1_realized_return — "How many points reach you?" (no noise → correct answer: 4)</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html（no-noise 分支）</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html (no-noise branch)</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
 
 For the second question, suppose you return 4 points to player 1 this round.</div>
-    <div class="field">part2_quiz_p2_account — "…can the points sent to you include points from player 1's accumulated account?"（本 cell 正确答案 Yes）</div>
-    <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?"（正确答案 4）</div>
+    <div class="field">part2_quiz_p2_account — "…can the points sent to you include points from player 1's accumulated account?" (correct answer in this cell: Yes)</div>
+    <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?" (correct answer: 4)</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html（reinvestment / no-noise 分支）</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html (reinvestment / no-noise branch)</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>You have a current-period endowment of {{ endowment }}. Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
 
 You choose how many points to send from the current-period endowment and how many points to use from the Part 2 accumulated account.
@@ -604,14 +604,14 @@ amount sent to player 2 = points sent from current-period endowment + points use
 amount player 2 receives = amount sent to player 2 x {{ C.MULTIPLIER }}
 
 Player 2 receives the full multiplied amount and then chooses how many points to return to you.</div>
-    <div class="field">reinvestment — "Amount from Part 2 accumulated account to use this round"（仅 reinvestment cell 出现）</div>
+    <div class="field">reinvestment — "Amount from Part 2 accumulated account to use this round" (appears only in reinvestment cells)</div>
     <div class="field">transfer — "Amount to send"</div>
     <div class="field">belief_partner_intended_return — "How many points do you think player 2 will return to you this round?"</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html（no-noise 分支）</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (no-noise branch)</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>In this round, you received {{ received_amount }}.
 
 You may choose how many points to return, from 0 to {{ max_return }}.
@@ -625,23 +625,23 @@ your earnings = amount you received - return chosen by you</div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-both">两人</span>Stage2Results<span class="fname">Stage2Results.html（reinvestment / no-noise）</span></div>
+  <div class="head"><span class="tag t-both">Both</span>Stage2Results<span class="fname">Stage2Results.html (reinvestment / no-noise)</span></div>
   <div class="body">
-    <p class="note">A 看到的分支（reinvestment 下多一行账户动用）：</p>
+    <p class="note">Branch A sees (reinvestment adds a line for the account drawn down):</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>You sent {{ player.transfer }} from the current endowment.
 You used {{ player.reinvestment }} from your Part 2 accumulated account.
 The amount player 2 received was {{ received_amount }}.
 The amount that reached you from player 2 this round was {{ realized_return }}.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
-[结尾二选一] The interaction continues to another round. / The interaction has stopped.</div>
-    <p class="note">B 看到的分支：</p>
+[one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
+    <p class="note">Branch B sees:</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>The final amount you received was {{ player.received_amount }}.
 You returned {{ player.intended_return }} to player 1.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
-[结尾二选一] The interaction continues to another round. / The interaction has stopped.</div>
-    <p class="small">本 cell 无噪声：两人在此页都不作答。</p>
+[one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
+    <p class="small">No noise in this cell: neither player answers anything on this page.</p>
   </div>
 </div>
 
@@ -649,16 +649,16 @@ Your Part 2 accumulated account balance is now {{ account_balance }}.
 <div class="cellhdr" id="c4">
   <div class="n">Cell 4</div>
   <div class="t">reinvestment × noise</div>
-  <div class="small">可再投资 · 有噪声。A 能动用账户余额，同时 B 的返还经过均值不变的随机调整才到达 A；归因模糊与再投资同时存在（H4 关注的崩溃与再投资作用即在此 cell）。</div>
+  <div class="small">Reinvestment · noise. A can draw on the account balance, and at the same time B's return passes through a mean-preserving random adjustment before reaching A; attribution ambiguity and reinvestment are present together (the collapse-and-reinvestment dynamic of H4 lives in this cell).</div>
 </div>
 
-<div class="chips"><b>A 的 Part 2 路径：</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [每轮：(第5轮起)Stage2StateWait <span class="arrow">→</span> Stage2Transfer<b>（多 reinvestment 字段）</b> <span class="arrow">→</span> 等待 <span class="arrow">→</span> Stage2Results<b>（答归因题）</b>] <span class="arrow">→ …</span></div>
-<div class="chips"><b>B 的 Part 2 路径：</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [每轮：(第5轮起)Stage2StateWait <span class="arrow">→</span> 等待 <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="chips"><b>A's Part 2 path:</b></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer<b> (extra reinvestment field)</b> <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results<b> (answers attribution question)</b>] <span class="arrow">→ …</span></div>
+<div class="chips"><b>B's Part 2 path:</b></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Part 2 规则页<span class="fname">Stage2InstructionsReinvestmentNoiseP1.html</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Part 2 rules<span class="fname">Stage2InstructionsReinvestmentNoiseP1.html</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2 Rules</span>Your pair remains the same. The same rules apply in every Part 2 round.
 
 In each round, you receive a {{ C.ENDOWMENT }} endowment. You may send points to player 2 from this endowment and from your Part 2 accumulated account.
@@ -678,7 +678,7 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Part 2 规则页<span class="fname">Stage2InstructionsReinvestmentNoiseP2.html</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Part 2 rules<span class="fname">Stage2InstructionsReinvestmentNoiseP2.html</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2 Rules</span>Your pair remains the same. The same rules apply in every Part 2 round.
 
 In each round, player 1 chooses how many points to send to you. Player 1 may send points from a current-round endowment of {{ C.ENDOWMENT }} and from player 1's Part 2 accumulated account.
@@ -696,29 +696,29 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html（noise 分支）</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html (noise branch)</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
 
 For the second question, suppose player 2 returns 4 points to you this round, and the computer adjustment for this round is x0.5.</div>
-    <div class="field">part2_quiz_p1_account — "…can you use points from your accumulated account…?"（正确答案 Yes）</div>
-    <div class="field">part2_quiz_p1_realized_return — "How many points reach you?"（noise×0.5 → 正确答案 2）</div>
+    <div class="field">part2_quiz_p1_account — "…can you use points from your accumulated account…?" (correct answer: Yes)</div>
+    <div class="field">part2_quiz_p1_realized_return — "How many points reach you?" (noise ×0.5 → correct answer: 2)</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html（noise 分支）</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html (noise branch)</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
 
 For the second question, suppose you return 4 points to player 1 this round, and the computer adjustment for this round is x0.5.</div>
-    <div class="field">part2_quiz_p2_account — "…can the points sent to you include points from player 1's accumulated account?"（正确答案 Yes）</div>
-    <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?"（正确答案 2）</div>
+    <div class="field">part2_quiz_p2_account — "…can the points sent to you include points from player 1's accumulated account?" (correct answer: Yes)</div>
+    <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?" (correct answer: 2)</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html（reinvestment / noise 分支）</span></div>
+  <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html (reinvestment / noise branch)</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>You have a current-period endowment of {{ endowment }}. Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
 
 You choose how many points to send from the current-period endowment and how many points to use from the Part 2 accumulated account.
@@ -737,7 +737,7 @@ The computer adjustment is then applied to the amount player 2 returns. You see 
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html（noise 分支）</span></div>
+  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (noise branch)</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>In this round, you received {{ received_amount }}.
 
 You may choose how many points to return, from 0 to {{ max_return }}.
@@ -751,39 +751,39 @@ your earnings = amount you received - return chosen by you</div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-both">两人</span>Stage2Results<span class="fname">Stage2Results.html（reinvestment / noise）</span></div>
+  <div class="head"><span class="tag t-both">Both</span>Stage2Results<span class="fname">Stage2Results.html (reinvestment / noise)</span></div>
   <div class="body">
-    <p class="note">A 看到的分支（reinvestment 多账户行；noise 下多答归因题）：</p>
+    <p class="note">Branch A sees (reinvestment adds the account line; under noise, A answers the attribution question):</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>You sent {{ player.transfer }} from the current endowment.
 You used {{ player.reinvestment }} from your Part 2 accumulated account.
 The amount player 2 received was {{ received_amount }}.
 The amount that reached you from player 2 this round was {{ realized_return }}.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
-[结尾二选一] The interaction continues to another round. / The interaction has stopped.</div>
-    <div class="field">signal_attribution（仅 A、仅 noise）— "To what extent did the amount that reached you reflect player 2's chosen return rather than the computer adjustment? (0 - entirely the computer adjustment, 10 - entirely player 2's choice)"</div>
-    <p class="note">B 看到的分支（无作答字段）：</p>
+[one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
+    <div class="field">signal_attribution (A only, noise only) — "To what extent did the amount that reached you reflect player 2's chosen return rather than the computer adjustment? (0 - entirely the computer adjustment, 10 - entirely player 2's choice)"</div>
+    <p class="note">Branch B sees (no answer field):</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>The final amount you received was {{ player.received_amount }}.
 You returned {{ player.intended_return }} to player 1.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
-[结尾二选一] The interaction continues to another round. / The interaction has stopped.</div>
+[one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
   </div>
 </div>
 
-<!-- ============ 四、结尾共享 ============ -->
-<h2 id="shared2">四、结尾共享页面（问卷 + 结算 · 所有 cell 相同）</h2>
+<!-- ============ 4. Closing shared ============ -->
+<h2 id="shared2">4. Closing shared pages (survey + settlement · identical across cells)</h2>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-both">两人</span>Survey<span class="fname">Survey.html</span></div>
+  <div class="head"><span class="tag t-both">Both</span>Survey<span class="fname">Survey.html</span></div>
   <div class="body">
     <div class="verbatim"><span class="ttl">Final Survey</span>Please answer a few final questions. Your answers are confidential and do not affect your payment.
 
 Background
 Preferences</div>
-    <p class="note">表单字段：</p>
-    <div class="field">gender — "What is your gender?"（Female / Male / Other / Prefer not to say）</div>
-    <div class="field">age — "What is your age?"（18–100）</div>
+    <p class="note">Form fields:</p>
+    <div class="field">gender — "What is your gender?" (Female / Male / Other / Prefer not to say)</div>
+    <div class="field">age — "What is your age?" (18–100)</div>
     <div class="field">risk_preference — "How willing are you to take risks in general? (1 - Not at all willing, 7 - Very willing)"</div>
     <div class="field">trust_most_people — "Generally speaking, would you say that most people can be trusted, or that you need to be very careful in dealing with people? (1 - Need to be very careful, 7 - Most people can be trusted)"</div>
     <div class="field">trust_willingness — "In general, how willing are you to trust other people? (1 - Not at all willing, 7 - Completely willing)"</div>
@@ -791,7 +791,7 @@ Preferences</div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-both">两人</span>FinalResults<span class="fname">FinalResults.html</span></div>
+  <div class="head"><span class="tag t-both">Both</span>FinalResults<span class="fname">FinalResults.html</span></div>
   <div class="body"><div class="verbatim"><span class="ttl">Final Results</span>Your Part 1 accumulated account balance is {{ part1_account }}.
 Your Part 2 accumulated account balance is {{ part2_account }}.
 Your final accumulated account balance is {{ total_payoff }}.
@@ -799,18 +799,18 @@ Thank you for participating.</div></div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-wait">等待页</span>Part 2 的同步 / 等待页<span class="fname">Stage2SetupWait · Stage2StateWait · WaitForStage2Transfer · WaitForStage2Return.html</span></div>
+  <div class="head"><span class="tag t-wait">Wait</span>Part 2 sync / wait pages<span class="fname">Stage2SetupWait · Stage2StateWait · WaitForStage2Transfer · WaitForStage2Return.html</span></div>
   <div class="body">
     <div class="verbatim">[Stage2SetupWait]  Please Wait — Preparing the second part of the experiment.
 [Stage2StateWait]  Please Wait — Preparing the next round.
 [WaitForStage2Transfer]  Please Wait — Waiting for player 1's decision.
-[WaitForStage2Return · A 看到]  The final amount player 2 received this round is {{ received_amount }}. Waiting for player 2's decision.
-[WaitForStage2Return · B 看到]  Waiting for the other player in your pair.</div>
+[WaitForStage2Return · A sees]  The final amount player 2 received this round is {{ received_amount }}. Waiting for player 2's decision.
+[WaitForStage2Return · B sees]  Waiting for the other player in your pair.</div>
   </div>
 </div>
 
 <hr>
-<p class="small">说明：preview_part1 / preview_part2 两个预览 app 复用的就是上面这些同名模板，文字与 official 完全一致。本文件为只读参考，不影响实验运行。</p>
+<p class="small">Note: the two preview apps (preview_part1 / preview_part2) reuse these same-named templates, so their text is identical to the official session. This document is a read-only reference and does not affect how the experiment runs.</p>
 
 </div>
 </body>

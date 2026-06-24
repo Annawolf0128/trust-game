@@ -4,17 +4,24 @@
 <p>
     Please answer these questions before Part 2 begins.
 </p>
+
+{{ formfield 'part2_quiz_p1_account' }}
+
+{{ formfield 'part2_quiz_p1_multiplier' }}
+
 {{ if has_noise }}
 <p>
-    For the second question, suppose player 2 returns 4 points to you this
-    round, and the computer adjustment for this round is x0.5.
+    For the next question, suppose player 2 chooses to return 4 points to you,
+    and the computer adjustment for this round is x0.5.
 </p>
 {{ else }}
 <p>
-    For the second question, suppose player 2 returns 4 points to you this
-    round.
+    For the next question, suppose player 2 chooses to return 4 points to you.
 </p>
 {{ endif }}
-{{ formfields }}
+{{ formfield 'part2_quiz_p1_realized_return' }}
+
+{{ formfield 'part2_quiz_p1_maxsend' }}
+
 {{ next_button }}
 {{ endblock }}

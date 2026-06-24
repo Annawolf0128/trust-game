@@ -4,11 +4,9 @@
 {{ if view_as_p1 }}
 <p>You sent <strong>{{ player.transfer }}</strong> and player 2 returned <strong>{{ player.realized_return }}</strong>.</p>
 <p>Your payoff this round is <strong>{{ player.round_payoff }}</strong>.</p>
-<p>Player 2's payoff this round is <strong>{{ partner.round_payoff }}</strong>.</p>
 {{ else }}
 <p>In this round, player 1 sent <strong>{{ partner.transfer }}</strong>. You returned <strong>{{ player.intended_return }}</strong>.</p>
 <p>Your payoff this round is <strong>{{ player.round_payoff }}</strong>.</p>
-<p>Player 1's payoff this round is <strong>{{ partner.round_payoff }}</strong>.</p>
 {{ endif }}
 <p>Your Part 1 accumulated account balance is now <strong>{{ account_balance }}</strong>.</p>
 {{ next_button }}

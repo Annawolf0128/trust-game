@@ -2,10 +2,13 @@
 
 {{ block content }}
 <p>
+    Your Part 2 accumulated account at the start of this round is <strong>{{ account }}</strong>.
+</p>
+<p>
     In this round, you received <strong>{{ received_amount }}</strong>.
 </p>
 <p>
-    You may choose how many points to return, from 0 to {{ max_return }}.
+    You may choose how many points to return, from 0 to {{ max_return }} points.
 </p>
 {{ if has_noise }}
 <p>

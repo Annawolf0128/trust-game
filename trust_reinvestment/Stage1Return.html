@@ -2,12 +2,15 @@
 
 {{ block content }}
 <p>
+    Your Part 1 accumulated account at the start of this round is <strong>{{ account }}</strong>.
+</p>
+<p>
     In this round, player 1 sent <strong>{{ transfer }}</strong> to you.
     This amount was multiplied by {{ multiplier }}, so you received
     <strong>{{ multiplied_amount }}</strong>.
 </p>
 <p>
-    You may return any amount from 0 to {{ max_return }} to player 1.
+    You may return any amount from 0 to {{ max_return }} points to player 1.
 </p>
 <p>
     your earnings = multiplied amount you received - points you return to player 1

@@ -3,24 +3,28 @@ from . import (
     NoReinvestmentNoNoiseP1,
     NoReinvestmentNoNoiseP2,
     NoReinvestmentNoNoiseTransfer,
+    NoReinvestmentNoNoiseBelief,
     NoReinvestmentNoNoiseReturn,
     NoReinvestmentNoNoiseResultsP1,
     NoReinvestmentNoNoiseResultsP2,
     NoReinvestmentNoiseP1,
     NoReinvestmentNoiseP2,
     NoReinvestmentNoiseTransfer,
+    NoReinvestmentNoiseBelief,
     NoReinvestmentNoiseReturn,
     NoReinvestmentNoiseResultsP1,
     NoReinvestmentNoiseResultsP2,
     ReinvestmentNoNoiseP1,
     ReinvestmentNoNoiseP2,
     ReinvestmentNoNoiseTransfer,
+    ReinvestmentNoNoiseBelief,
     ReinvestmentNoNoiseReturn,
     ReinvestmentNoNoiseResultsP1,
     ReinvestmentNoNoiseResultsP2,
     ReinvestmentNoiseP1,
     ReinvestmentNoiseP2,
     ReinvestmentNoiseTransfer,
+    ReinvestmentNoiseBelief,
     ReinvestmentNoiseReturn,
     ReinvestmentNoiseResultsP1,
     ReinvestmentNoiseResultsP2,
@@ -28,12 +32,13 @@ from . import (
 )
 
 
-# Each cell maps to its six page classes, in display order.
+# Each cell maps to its page classes, in display order.
 CELLS = {
     ("no_reinvestment", "no_noise"): (
         NoReinvestmentNoNoiseP1,
         NoReinvestmentNoNoiseP2,
         NoReinvestmentNoNoiseTransfer,
+        NoReinvestmentNoNoiseBelief,
         NoReinvestmentNoNoiseReturn,
         NoReinvestmentNoNoiseResultsP1,
         NoReinvestmentNoNoiseResultsP2,
@@ -42,6 +47,7 @@ CELLS = {
         NoReinvestmentNoiseP1,
         NoReinvestmentNoiseP2,
         NoReinvestmentNoiseTransfer,
+        NoReinvestmentNoiseBelief,
         NoReinvestmentNoiseReturn,
         NoReinvestmentNoiseResultsP1,
         NoReinvestmentNoiseResultsP2,
@@ -50,6 +56,7 @@ CELLS = {
         ReinvestmentNoNoiseP1,
         ReinvestmentNoNoiseP2,
         ReinvestmentNoNoiseTransfer,
+        ReinvestmentNoNoiseBelief,
         ReinvestmentNoNoiseReturn,
         ReinvestmentNoNoiseResultsP1,
         ReinvestmentNoNoiseResultsP2,
@@ -58,6 +65,7 @@ CELLS = {
         ReinvestmentNoiseP1,
         ReinvestmentNoiseP2,
         ReinvestmentNoiseTransfer,
+        ReinvestmentNoiseBelief,
         ReinvestmentNoiseReturn,
         ReinvestmentNoiseResultsP1,
         ReinvestmentNoiseResultsP2,
@@ -83,26 +91,36 @@ class PlayerBot(Bot):
             ]
 
         for treatment, noise in cells:
-            p1, p2, transfer, ret, results_p1, results_p2 = CELLS[(treatment, noise)]
+            p1, p2, transfer, belief, ret, results_p1, results_p2 = CELLS[
+                (treatment, noise)
+            ]
             is_reinvestment = treatment == "reinvestment"
             has_noise = noise == "noise"
 
             yield p1
             yield p2
 
-            transfer_data = dict(transfer=4, belief_partner_intended_return=6)
-            if is_reinvestment:
-                transfer_data["reinvestment"] = 2
+            transfer_data = dict(amount_sent=4, belief_partner_intended_return=6)
             yield Submission(transfer, transfer_data, check_html=False)
 
             yield Submission(
-                ret,
-                dict(intended_return=5, belief_partner_transfer=4),
+                belief,
+                dict(belief_partner_transfer=4),
                 check_html=False,
             )
 
-            # Only player 1 reports signal attribution, and only under noise.
-            p1_results_data = dict(signal_attribution=5) if has_noise else dict()
+            yield Submission(
+                ret,
+                dict(intended_return=5),
+                check_html=False,
+            )
+
+            # Only player 1 reports the posterior + attribution, and only under noise.
+            p1_results_data = (
+                dict(belief_partner_return_post=3, signal_attribution=5)
+                if has_noise
+                else dict()
+            )
             yield Submission(results_p1, p1_results_data, check_html=False)
             yield Submission(results_p2, dict(), check_html=False)
 

@@ -2,28 +2,22 @@
 
 {{ block content }}
 <p>
-    You have a current-period endowment of {{ endowment }}.
-    Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
+    Your Part 2 accumulated account at the start of this round is <strong>{{ safe_account }}</strong>.
+    You also receive a current-period endowment of <strong>{{ endowment }}</strong> for this round.
 </p>
 {{ if is_reinvestment }}
 <p>
-    You choose how many points to send from the current-period endowment and how
-    many points to use from the Part 2 accumulated account.
-</p>
-<p>
-    amount sent to player 2 = points sent from current-period endowment + points used from Part 2 accumulated account
+    You can send any amount from 0 to {{ max_send }} points (your current-period
+    endowment plus your accumulated account).
 </p>
 {{ else }}
 <p>
-    You choose how many points to send from the current-period endowment. Your
-    Part 2 accumulated account balance cannot be used in this round.
-</p>
-<p>
-    amount sent to player 2 = points sent from current-period endowment
+    You can send any amount from 0 to {{ max_send }} points (your current-period
+    endowment). Your accumulated account cannot be used in this round.
 </p>
 {{ endif }}
 <p>
-    amount player 2 receives = amount sent to player 2 x {{ C.MULTIPLIER }}
+    amount player 2 receives = amount you send x {{ C.MULTIPLIER }}
 </p>
 <p>
     Player 2 receives the full multiplied amount and then chooses how many

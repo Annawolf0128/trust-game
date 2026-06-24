@@ -2,10 +2,12 @@
 
 {{ block content }}
 <p>
-    You have {{ endowment }} this round.
+    Your Part 1 accumulated account at the start of this round is <strong>{{ account }}</strong>.
+    You also receive a current-period endowment of <strong>{{ endowment }}</strong> for this round.
 </p>
 <p>
-    The amount you send will be multiplied by {{ multiplier }}.
+    You can send any amount from 0 to {{ endowment }} points. The amount you send
+    will be multiplied by {{ multiplier }}.
 </p>
 <p>
     player 2 receives = amount you send x {{ multiplier }}

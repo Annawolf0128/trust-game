@@ -1,0 +1,23 @@
+{{ block title }}Part 2: round {{ stage2_round }}{{ endblock }}
+
+{{ block content }}
+<p>
+    Your Part 2 accumulated account at the start of this round is <strong>{{ account }}</strong>.
+</p>
+{{ if is_reinvestment }}
+<p>
+    Player 1 may send up to {{ max_send }} points to you this round (a
+    current-period endowment of {{ endowment }} plus their accumulated account).
+</p>
+{{ else }}
+<p>
+    Player 1 may send up to {{ max_send }} points to you this round (their
+    current-period endowment).
+</p>
+{{ endif }}
+<p>
+    Before you learn player 1's decision, please tell us what you expect.
+</p>
+{{ formfields }}
+{{ next_button }}
+{{ endblock }}

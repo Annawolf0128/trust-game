@@ -54,6 +54,24 @@ class Group(BaseGroup):
     stage2_should_continue = models.BooleanField(initial=True)
 
 
+# Quiz choice sets. Defined at module level (not as Player class attributes),
+# because oTree forbids list/dict class attributes on a model class.
+MAX_SEND_CHOICES = [
+    ["endowment_only", "Only your current-period endowment"],
+    ["endowment_plus_account", "Your current-period endowment plus your accumulated account"],
+    ["triple", "Three times your current-period endowment"],
+    ["unlimited", "Any amount, with no limit"],
+]
+MAX_SEND_CHOICES_P2 = [
+    ["endowment_only", "Only player 1's current-period endowment"],
+    ["endowment_plus_account", "Player 1's current-period endowment plus their accumulated account"],
+    ["triple", "Three times player 1's current-period endowment"],
+    ["unlimited", "Any amount, with no limit"],
+]
+MULTIPLIER_CHOICES = [[1, "1"], [4, "4"], [7, "7"], [12, "12"]]
+REALIZED_RETURN_CHOICES = [[2, "2"], [4, "4"], [6, "6"], [12, "12"]]
+
+
 class Player(BasePlayer):
     role_label = models.StringField()
 
@@ -61,6 +79,7 @@ class Player(BasePlayer):
     stage2_round = models.IntegerField(blank=True)
 
     transfer = models.CurrencyField(label="Amount to send", min=0)
+    amount_sent = models.CurrencyField(label="Amount to send", min=0, blank=True)
     intended_return = models.CurrencyField(label="Amount to return", min=0, blank=True)
     realized_return = models.CurrencyField(initial=0)
     noise_factor = models.FloatField(blank=True)
@@ -88,6 +107,11 @@ class Player(BasePlayer):
     )
     belief_partner_transfer = models.CurrencyField(
         label="How many points do you think player 1 chose to send to you this round?",
+        min=0,
+        blank=True,
+    )
+    belief_partner_return_post = models.CurrencyField(
+        label="Now that you have seen the amount that reached you, how many points do you think player 2 actually chose to return this round?",
         min=0,
         blank=True,
     )
@@ -152,6 +176,7 @@ class Player(BasePlayer):
         min=0,
         blank=True,
     )
+
     part2_quiz_p1_account = models.IntegerField(
         label="In your Part 2 rules, can you use points from your accumulated account in the current round?",
         choices=[
@@ -161,9 +186,22 @@ class Player(BasePlayer):
         widget=widgets.RadioSelect,
         blank=True,
     )
+    part2_quiz_p1_multiplier = models.IntegerField(
+        label="If you send 4 points to player 2, how many points does player 2 receive?",
+        choices=MULTIPLIER_CHOICES,
+        widget=widgets.RadioSelect,
+        blank=True,
+    )
     part2_quiz_p1_realized_return = models.IntegerField(
         label="How many points reach you?",
-        min=0,
+        choices=REALIZED_RETURN_CHOICES,
+        widget=widgets.RadioSelect,
+        blank=True,
+    )
+    part2_quiz_p1_maxsend = models.StringField(
+        label="What is the most you can send to player 2 in a round?",
+        choices=MAX_SEND_CHOICES,
+        widget=widgets.RadioSelect,
         blank=True,
     )
     part2_quiz_p2_account = models.IntegerField(
@@ -175,9 +213,22 @@ class Player(BasePlayer):
         widget=widgets.RadioSelect,
         blank=True,
     )
+    part2_quiz_p2_multiplier = models.IntegerField(
+        label="If player 1 sends 4 points to you, how many points do you receive?",
+        choices=MULTIPLIER_CHOICES,
+        widget=widgets.RadioSelect,
+        blank=True,
+    )
     part2_quiz_p2_realized_return = models.IntegerField(
         label="How many points reach player 1?",
-        min=0,
+        choices=REALIZED_RETURN_CHOICES,
+        widget=widgets.RadioSelect,
+        blank=True,
+    )
+    part2_quiz_p2_maxsend = models.StringField(
+        label="What is the most player 1 can send to you in a round?",
+        choices=MAX_SEND_CHOICES_P2,
+        widget=widgets.RadioSelect,
         blank=True,
     )
 
@@ -410,6 +461,10 @@ def set_stage2_received_amount(group: Group):
     player_b = group.get_player_by_id(2)
     player_a.safe_account_start = participant_part2_account(player_a)
     player_b.safe_account_start = participant_part2_account(player_b)
+    # Player 1 enters a single send amount; spend the current-period endowment
+    # first, then draw any remainder from the accumulated account.
+    player_a.transfer = min(player_a.amount_sent, C.ENDOWMENT)
+    player_a.reinvestment = player_a.amount_sent - player_a.transfer
     player_a.total_exposure = player_a.transfer + player_a.reinvestment
     player_a.retained_amount = player_a.safe_account_start - player_a.reinvestment
 
@@ -529,7 +584,7 @@ class Part1QuizP2(Page):
 
 class Stage1Transfer(Page):
     form_model = "player"
-    form_fields = ["transfer"]
+    form_fields = ["transfer", "belief_partner_intended_return"]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -538,6 +593,7 @@ class Stage1Transfer(Page):
     @staticmethod
     def vars_for_template(player: Player):
         return dict(
+            account=participant_part1_account(player),
             endowment=C.ENDOWMENT,
             multiplier=C.MULTIPLIER,
             stage1_round=player.round_number,
@@ -548,6 +604,39 @@ class Stage1Transfer(Page):
     def error_message(player: Player, values):
         if values["transfer"] > C.ENDOWMENT:
             return "Transfer cannot exceed your current-period endowment."
+        max_possible_return = values["transfer"] * C.MULTIPLIER
+        if values["belief_partner_intended_return"] > max_possible_return:
+            return (
+                "Your belief about the return cannot exceed the multiplied "
+                "amount player 2 would receive."
+            )
+
+
+class Stage1TransferBelief(Page):
+    form_model = "player"
+    form_fields = ["belief_partner_transfer"]
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return current_stage(player) == 1 and is_player_b(player)
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        return dict(
+            account=participant_part1_account(player),
+            endowment=C.ENDOWMENT,
+            multiplier=C.MULTIPLIER,
+            stage1_round=player.round_number,
+            stage1_rounds=C.STAGE1_ROUNDS,
+        )
+
+    @staticmethod
+    def error_message(player: Player, values):
+        if values["belief_partner_transfer"] > C.ENDOWMENT:
+            return (
+                "Your belief about the amount sent cannot exceed player 1's "
+                "current-period endowment."
+            )
 
 
 class Stage1Return(Page):
@@ -562,6 +651,7 @@ class Stage1Return(Page):
     def vars_for_template(player: Player):
         player_a = player.group.get_player_by_id(1)
         return dict(
+            account=participant_part1_account(player),
             transfer=player_a.transfer,
             multiplied_amount=stage1_return_max(player),
             max_return=stage1_return_max(player),
@@ -718,7 +808,12 @@ class Stage2InstructionsReinvestmentNoiseP2(Page):
 
 class Stage2QuizP1(Page):
     form_model = "player"
-    form_fields = ["part2_quiz_p1_account", "part2_quiz_p1_realized_return"]
+    form_fields = [
+        "part2_quiz_p1_account",
+        "part2_quiz_p1_multiplier",
+        "part2_quiz_p1_realized_return",
+        "part2_quiz_p1_maxsend",
+    ]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -733,19 +828,31 @@ class Stage2QuizP1(Page):
 
     @staticmethod
     def error_message(player: Player, values):
-        expected_account_answer = 1 if uses_account_in_part2(player) else 0
         errors = {}
+        expected_account_answer = 1 if uses_account_in_part2(player) else 0
         if values["part2_quiz_p1_account"] != expected_account_answer:
             errors["part2_quiz_p1_account"] = "Please check the account rule for Part 2."
+        if values["part2_quiz_p1_multiplier"] != 12:
+            errors["part2_quiz_p1_multiplier"] = "Please check the multiplication rule."
         expected_return_answer = 2 if has_noise_in_part2(player) else 4
         if values["part2_quiz_p1_realized_return"] != expected_return_answer:
             errors["part2_quiz_p1_realized_return"] = "Please check the return rule for Part 2."
+        expected_maxsend = (
+            "endowment_plus_account" if uses_account_in_part2(player) else "endowment_only"
+        )
+        if values["part2_quiz_p1_maxsend"] != expected_maxsend:
+            errors["part2_quiz_p1_maxsend"] = "Please check how much you can send in Part 2."
         return errors
 
 
 class Stage2QuizP2(Page):
     form_model = "player"
-    form_fields = ["part2_quiz_p2_account", "part2_quiz_p2_realized_return"]
+    form_fields = [
+        "part2_quiz_p2_account",
+        "part2_quiz_p2_multiplier",
+        "part2_quiz_p2_realized_return",
+        "part2_quiz_p2_maxsend",
+    ]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -760,13 +867,20 @@ class Stage2QuizP2(Page):
 
     @staticmethod
     def error_message(player: Player, values):
-        expected_account_answer = 1 if uses_account_in_part2(player) else 0
         errors = {}
+        expected_account_answer = 1 if uses_account_in_part2(player) else 0
         if values["part2_quiz_p2_account"] != expected_account_answer:
             errors["part2_quiz_p2_account"] = "Please check the account rule for Part 2."
+        if values["part2_quiz_p2_multiplier"] != 12:
+            errors["part2_quiz_p2_multiplier"] = "Please check the multiplication rule."
         expected_return_answer = 2 if has_noise_in_part2(player) else 4
         if values["part2_quiz_p2_realized_return"] != expected_return_answer:
             errors["part2_quiz_p2_realized_return"] = "Please check the return rule for Part 2."
+        expected_maxsend = (
+            "endowment_plus_account" if uses_account_in_part2(player) else "endowment_only"
+        )
+        if values["part2_quiz_p2_maxsend"] != expected_maxsend:
+            errors["part2_quiz_p2_maxsend"] = "Please check how much player 1 can send in Part 2."
         return errors
 
 
@@ -784,26 +898,22 @@ class Stage2StateWait(WaitPage):
 
 class Stage2Transfer(Page):
     form_model = "player"
-    form_fields = ["reinvestment", "transfer", "belief_partner_intended_return"]
+    form_fields = ["amount_sent", "belief_partner_intended_return"]
 
     @staticmethod
     def is_displayed(player: Player):
         return current_stage(player) == 2 and active_in_stage2(player.group) and is_player_a(player)
 
     @staticmethod
-    def get_form_fields(player: Player):
-        if uses_account_in_part2(player):
-            return ["reinvestment", "transfer", "belief_partner_intended_return"]
-        return ["transfer", "belief_partner_intended_return"]
-
-    @staticmethod
     def vars_for_template(player: Player):
         safe_account = participant_part2_account(player)
         player.safe_account_start = safe_account
+        max_send = C.ENDOWMENT + safe_account if uses_account_in_part2(player) else C.ENDOWMENT
         return dict(
             treatment=player.group.treatment,
             endowment=C.ENDOWMENT,
             safe_account=safe_account,
+            max_send=max_send,
             is_reinvestment=uses_account_in_part2(player),
             has_noise=has_noise_in_part2(player),
             stage2_round=stage2_round_number(player),
@@ -812,24 +922,18 @@ class Stage2Transfer(Page):
     @staticmethod
     def error_message(player: Player, values):
         safe_account = participant_part2_account(player)
-        reinvestment = values.get("reinvestment") or cu(0)
-        transfer = values["transfer"]
-
-        if not uses_account_in_part2(player) and reinvestment:
-            return "Using accumulated points is only available in this condition."
-        if reinvestment > safe_account:
-            return "The amount used from your account cannot exceed your Part 2 accumulated account balance."
-        if transfer > C.ENDOWMENT:
-            return "Current transfer cannot exceed your current-period endowment."
-        total_exposure = transfer + reinvestment
-        max_possible_return = total_exposure * C.MULTIPLIER
+        max_send = C.ENDOWMENT + safe_account if uses_account_in_part2(player) else C.ENDOWMENT
+        amount_sent = values["amount_sent"]
+        if amount_sent > max_send:
+            return f"The amount you send cannot exceed {max_send} this round."
+        max_possible_return = amount_sent * C.MULTIPLIER
         if values["belief_partner_intended_return"] > max_possible_return:
             return "Belief about player 2's return cannot exceed the maximum amount player 2 could return."
 
 
-class Stage2Return(Page):
+class Stage2TransferBelief(Page):
     form_model = "player"
-    form_fields = ["intended_return", "belief_partner_transfer"]
+    form_fields = ["belief_partner_transfer"]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -838,7 +942,43 @@ class Stage2Return(Page):
     @staticmethod
     def vars_for_template(player: Player):
         player_a = player.group.get_player_by_id(1)
+        max_send = (
+            C.ENDOWMENT + participant_part2_account(player_a)
+            if uses_account_in_part2(player)
+            else C.ENDOWMENT
+        )
         return dict(
+            account=participant_part2_account(player),
+            endowment=C.ENDOWMENT,
+            max_send=max_send,
+            is_reinvestment=uses_account_in_part2(player),
+            stage2_round=stage2_round_number(player),
+        )
+
+    @staticmethod
+    def error_message(player: Player, values):
+        player_a = player.group.get_player_by_id(1)
+        max_possible_transfer = (
+            C.ENDOWMENT + participant_part2_account(player_a)
+            if uses_account_in_part2(player)
+            else C.ENDOWMENT
+        )
+        if values["belief_partner_transfer"] > max_possible_transfer:
+            return "Belief about player 1's chosen amount cannot exceed the maximum amount player 1 could send."
+
+
+class Stage2Return(Page):
+    form_model = "player"
+    form_fields = ["intended_return"]
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return current_stage(player) == 2 and active_in_stage2(player.group) and is_player_b(player)
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        return dict(
+            account=participant_part2_account(player),
             received_amount=player.received_amount,
             max_return=stage2_return_max(player),
             multiplier=C.MULTIPLIER,
@@ -850,14 +990,6 @@ class Stage2Return(Page):
     def error_message(player: Player, values):
         if values["intended_return"] > stage2_return_max(player):
             return "Return cannot exceed the amount you received."
-        player_a = player.group.get_player_by_id(1)
-        max_possible_transfer = (
-            C.ENDOWMENT + player_a.safe_account_start
-            if uses_account_in_part2(player)
-            else C.ENDOWMENT
-        )
-        if values["belief_partner_transfer"] > max_possible_transfer:
-            return "Belief about player 1's chosen amount cannot exceed the maximum amount player 1 could send."
 
 
 class WaitForStage2Transfer(WaitPage):
@@ -893,8 +1025,19 @@ class Stage2Results(Page):
     def get_form_fields(player: Player):
         # Only player 1 faces the ambiguity, so only player 1 reports attribution.
         if has_noise_in_part2(player) and is_player_a(player):
-            return ["signal_attribution"]
+            return ["belief_partner_return_post", "signal_attribution"]
         return []
+
+    @staticmethod
+    def error_message(player: Player, values):
+        if has_noise_in_part2(player) and is_player_a(player):
+            player_b = player.group.get_player_by_id(2)
+            max_possible_return = player_b.received_amount
+            if values["belief_partner_return_post"] > max_possible_return:
+                return (
+                    "Your belief about player 2's return cannot exceed the "
+                    "amount player 2 received this round."
+                )
 
     @staticmethod
     def vars_for_template(player: Player):
@@ -926,6 +1069,14 @@ class Survey(Page):
         return player.round_number == C.NUM_ROUNDS
 
 
+class FinalWait(WaitPage):
+    wait_for_all_groups = True
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == C.NUM_ROUNDS
+
+
 class FinalResults(Page):
     @staticmethod
     def is_displayed(player: Player):
@@ -948,6 +1099,7 @@ page_sequence = [
     Part1QuizP1,
     Part1QuizP2,
     Stage1Transfer,
+    Stage1TransferBelief,
     WaitForStage1Transfer,
     Stage1Return,
     WaitForStage1Return,
@@ -965,10 +1117,12 @@ page_sequence = [
     Stage2QuizP2,
     Stage2StateWait,
     Stage2Transfer,
+    Stage2TransferBelief,
     WaitForStage2Transfer,
     Stage2Return,
     WaitForStage2Return,
     Stage2Results,
     Survey,
+    FinalWait,
     FinalResults,
 ]

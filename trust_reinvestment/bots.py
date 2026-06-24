@@ -12,6 +12,7 @@ from . import (
     Stage1Results,
     Stage1Return,
     Stage1Transfer,
+    Stage1TransferBelief,
     Stage2InstructionsNoReinvestmentNoNoiseP1,
     Stage2InstructionsNoReinvestmentNoNoiseP2,
     Stage2InstructionsNoReinvestmentNoiseP1,
@@ -25,6 +26,7 @@ from . import (
     Stage2Results,
     Stage2Return,
     Stage2Transfer,
+    Stage2TransferBelief,
     Survey,
 )
 
@@ -63,42 +65,56 @@ class PlayerBot(Bot):
 
         if self.round_number <= C.STAGE1_ROUNDS:
             if self.player.id_in_group == 1:
-                yield Stage1Transfer, dict(transfer=5)
+                yield Stage1Transfer, dict(
+                    transfer=5,
+                    belief_partner_intended_return=6,
+                )
             else:
+                yield Stage1TransferBelief, dict(belief_partner_transfer=5)
                 yield Stage1Return, dict(intended_return=7)
             yield Stage1Results
             return
 
         if self.round_number == C.STAGE1_ROUNDS + 1:
             realized_return_answer = 2 if self.group.noise_treatment == C.NOISE else 4
+            account_answer = 1 if self.group.treatment == C.REINVESTMENT else 0
+            maxsend_answer = (
+                "endowment_plus_account"
+                if self.group.treatment == C.REINVESTMENT
+                else "endowment_only"
+            )
             if self.player.id_in_group == 1:
                 yield stage2_instruction_page(self.player)
                 yield Stage2QuizP1, dict(
-                    part2_quiz_p1_account=1 if self.group.treatment == C.REINVESTMENT else 0,
+                    part2_quiz_p1_account=account_answer,
+                    part2_quiz_p1_multiplier=12,
                     part2_quiz_p1_realized_return=realized_return_answer,
+                    part2_quiz_p1_maxsend=maxsend_answer,
                 )
             else:
                 yield stage2_instruction_page(self.player)
                 yield Stage2QuizP2, dict(
-                    part2_quiz_p2_account=1 if self.group.treatment == C.REINVESTMENT else 0,
+                    part2_quiz_p2_account=account_answer,
+                    part2_quiz_p2_multiplier=12,
                     part2_quiz_p2_realized_return=realized_return_answer,
+                    part2_quiz_p2_maxsend=maxsend_answer,
                 )
 
         pair_active = active_in_stage2(self.group)
         if pair_active:
             if self.player.id_in_group == 1:
-                form = dict(transfer=4)
-                if self.group.treatment == C.REINVESTMENT:
-                    form["reinvestment"] = 0
-                form["belief_partner_intended_return"] = 6
-                yield Stage2Transfer, form
-            else:
-                yield Stage2Return, dict(
-                    intended_return=6,
-                    belief_partner_transfer=4,
+                yield Stage2Transfer, dict(
+                    amount_sent=4,
+                    belief_partner_intended_return=6,
                 )
+            else:
+                yield Stage2TransferBelief, dict(belief_partner_transfer=4)
+                yield Stage2Return, dict(intended_return=6)
             if self.group.noise_treatment == C.NOISE and self.player.id_in_group == 1:
-                yield Stage2Results, dict(signal_attribution=5)
+                yield Stage2Results, dict(
+                    belief_partner_return_post=3,
+                    signal_attribution=5,
+                )
             else:
                 yield Stage2Results
 

@@ -85,6 +85,7 @@ class Player(BasePlayer):
     # Decision fields, identical to trust_reinvestment so the send/return
     # screens render their form widgets and the results screen has data.
     transfer = models.CurrencyField(label="Amount to send", min=0, blank=True)
+    amount_sent = models.CurrencyField(label="Amount to send", min=0, blank=True)
     reinvestment = models.CurrencyField(
         label="Amount from Part 2 accumulated account to use this round",
         min=0,
@@ -98,6 +99,11 @@ class Player(BasePlayer):
     )
     belief_partner_transfer = models.CurrencyField(
         label="How many points do you think player 1 chose to send to you this round?",
+        min=0,
+        blank=True,
+    )
+    belief_partner_return_post = models.CurrencyField(
+        label="Now that you have seen the amount that reached you, how many points do you think player 2 actually chose to return this round?",
         min=0,
         blank=True,
     )
@@ -167,18 +173,29 @@ def _cell_numbers(is_reinvestment, has_noise):
 
 
 def _transfer_fields(is_reinvestment):
-    if is_reinvestment:
-        return ["reinvestment", "transfer", "belief_partner_intended_return"]
-    return ["transfer", "belief_partner_intended_return"]
+    return ["amount_sent", "belief_partner_intended_return"]
 
 
 def _transfer_vars(is_reinvestment, has_noise):
+    max_send = C.ENDOWMENT + C.SAFE_ACCOUNT if is_reinvestment else C.ENDOWMENT
     return dict(
         treatment=_treatment(is_reinvestment),
         endowment=C.ENDOWMENT,
         safe_account=C.SAFE_ACCOUNT,
+        max_send=max_send,
         is_reinvestment=is_reinvestment,
         has_noise=has_noise,
+        stage2_round=1,
+    )
+
+
+def _belief_vars(is_reinvestment, has_noise):
+    max_send = C.ENDOWMENT + C.SAFE_ACCOUNT if is_reinvestment else C.ENDOWMENT
+    return dict(
+        account=C.SAFE_ACCOUNT,
+        endowment=C.ENDOWMENT,
+        max_send=max_send,
+        is_reinvestment=is_reinvestment,
         stage2_round=1,
     )
 
@@ -186,6 +203,7 @@ def _transfer_vars(is_reinvestment, has_noise):
 def _return_vars(is_reinvestment, has_noise):
     n = _cell_numbers(is_reinvestment, has_noise)
     return dict(
+        account=C.SAFE_ACCOUNT,
         received_amount=n["received"],
         max_return=n["received"],
         multiplier=C.MULTIPLIER,
@@ -228,8 +246,10 @@ def _results_p2_vars(player, is_reinvestment, has_noise):
     )
 
 
-def _results_fields(has_noise):
-    return ["signal_attribution"] if has_noise else []
+def _results_fields(has_noise, is_p1=False):
+    if has_noise and is_p1:
+        return ["belief_partner_return_post", "signal_attribution"]
+    return []
 
 
 # ---------------------------------------------------------------------------
@@ -248,10 +268,16 @@ class _Transfer(Page):
     form_model = "player"
 
 
+class _TransferBelief(Page):
+    template_name = "trust_reinvestment/Stage2TransferBelief.html"
+    form_model = "player"
+    form_fields = ["belief_partner_transfer"]
+
+
 class _Return(Page):
     template_name = "trust_reinvestment/Stage2Return.html"
     form_model = "player"
-    form_fields = ["intended_return", "belief_partner_transfer"]
+    form_fields = ["intended_return"]
 
 
 class _Results(Page):
@@ -294,6 +320,16 @@ class NoReinvestmentNoNoiseTransfer(_Transfer):
         return _transfer_vars(False, False)
 
 
+class NoReinvestmentNoNoiseBelief(_TransferBelief):
+    @staticmethod
+    def is_displayed(player: Player):
+        return _in_cell(player, False, False)
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        return _belief_vars(False, False)
+
+
 class NoReinvestmentNoNoiseReturn(_Return):
     @staticmethod
     def is_displayed(player: Player):
@@ -311,7 +347,7 @@ class NoReinvestmentNoNoiseResultsP1(_Results):
 
     @staticmethod
     def get_form_fields(player: Player):
-        return _results_fields(False)
+        return _results_fields(False, is_p1=True)
 
     @staticmethod
     def vars_for_template(player: Player):
@@ -367,6 +403,16 @@ class NoReinvestmentNoiseTransfer(_Transfer):
         return _transfer_vars(False, True)
 
 
+class NoReinvestmentNoiseBelief(_TransferBelief):
+    @staticmethod
+    def is_displayed(player: Player):
+        return _in_cell(player, False, True)
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        return _belief_vars(False, True)
+
+
 class NoReinvestmentNoiseReturn(_Return):
     @staticmethod
     def is_displayed(player: Player):
@@ -384,7 +430,7 @@ class NoReinvestmentNoiseResultsP1(_Results):
 
     @staticmethod
     def get_form_fields(player: Player):
-        return _results_fields(True)
+        return _results_fields(True, is_p1=True)
 
     @staticmethod
     def vars_for_template(player: Player):
@@ -440,6 +486,16 @@ class ReinvestmentNoNoiseTransfer(_Transfer):
         return _transfer_vars(True, False)
 
 
+class ReinvestmentNoNoiseBelief(_TransferBelief):
+    @staticmethod
+    def is_displayed(player: Player):
+        return _in_cell(player, True, False)
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        return _belief_vars(True, False)
+
+
 class ReinvestmentNoNoiseReturn(_Return):
     @staticmethod
     def is_displayed(player: Player):
@@ -457,7 +513,7 @@ class ReinvestmentNoNoiseResultsP1(_Results):
 
     @staticmethod
     def get_form_fields(player: Player):
-        return _results_fields(False)
+        return _results_fields(False, is_p1=True)
 
     @staticmethod
     def vars_for_template(player: Player):
@@ -513,6 +569,16 @@ class ReinvestmentNoiseTransfer(_Transfer):
         return _transfer_vars(True, True)
 
 
+class ReinvestmentNoiseBelief(_TransferBelief):
+    @staticmethod
+    def is_displayed(player: Player):
+        return _in_cell(player, True, True)
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        return _belief_vars(True, True)
+
+
 class ReinvestmentNoiseReturn(_Return):
     @staticmethod
     def is_displayed(player: Player):
@@ -530,7 +596,7 @@ class ReinvestmentNoiseResultsP1(_Results):
 
     @staticmethod
     def get_form_fields(player: Player):
-        return _results_fields(True)
+        return _results_fields(True, is_p1=True)
 
     @staticmethod
     def vars_for_template(player: Player):
@@ -568,6 +634,7 @@ page_sequence = [
     NoReinvestmentNoNoiseP1,
     NoReinvestmentNoNoiseP2,
     NoReinvestmentNoNoiseTransfer,
+    NoReinvestmentNoNoiseBelief,
     NoReinvestmentNoNoiseReturn,
     NoReinvestmentNoNoiseResultsP1,
     NoReinvestmentNoNoiseResultsP2,
@@ -575,6 +642,7 @@ page_sequence = [
     NoReinvestmentNoiseP1,
     NoReinvestmentNoiseP2,
     NoReinvestmentNoiseTransfer,
+    NoReinvestmentNoiseBelief,
     NoReinvestmentNoiseReturn,
     NoReinvestmentNoiseResultsP1,
     NoReinvestmentNoiseResultsP2,
@@ -582,6 +650,7 @@ page_sequence = [
     ReinvestmentNoNoiseP1,
     ReinvestmentNoNoiseP2,
     ReinvestmentNoNoiseTransfer,
+    ReinvestmentNoNoiseBelief,
     ReinvestmentNoNoiseReturn,
     ReinvestmentNoNoiseResultsP1,
     ReinvestmentNoNoiseResultsP2,
@@ -589,6 +658,7 @@ page_sequence = [
     ReinvestmentNoiseP1,
     ReinvestmentNoiseP2,
     ReinvestmentNoiseTransfer,
+    ReinvestmentNoiseBelief,
     ReinvestmentNoiseReturn,
     ReinvestmentNoiseResultsP1,
     ReinvestmentNoiseResultsP2,

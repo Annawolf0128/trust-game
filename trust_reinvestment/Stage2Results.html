@@ -2,22 +2,22 @@
 
 {{ block content }}
 {{ if view_as_p1 }}
-<p>You sent {{ player.transfer }} from the current endowment.</p>
+<p>You sent <strong>{{ player.transfer }}</strong> from the current endowment.</p>
 {{ if treatment == C.REINVESTMENT }}
-<p>You used {{ player.reinvestment }} from your Part 2 accumulated account.</p>
+<p>You used <strong>{{ player.reinvestment }}</strong> from your Part 2 accumulated account.</p>
 {{ endif }}
-<p>The amount player 2 received was {{ received_amount }}.</p>
+<p>The amount player 2 received was <strong>{{ received_amount }}</strong>.</p>
 <p>
-    The amount that reached you from player 2 this round was {{ realized_return }}.
+    The amount that reached you from player 2 this round was <strong>{{ realized_return }}</strong>.
 </p>
 {{ else }}
-<p>The final amount you received was {{ player.received_amount }}.</p>
+<p>The final amount you received was <strong>{{ player.received_amount }}</strong>.</p>
 <p>
-    You returned {{ player.intended_return }} to player 1.
+    You returned <strong>{{ player.intended_return }}</strong> to player 1.
 </p>
 {{ endif }}
-<p>Your payoff this round is {{ player.round_payoff }}.</p>
-<p>Your Part 2 accumulated account balance is now {{ account_balance }}.</p>
+<p>Your payoff this round is <strong>{{ player.round_payoff }}</strong>.</p>
+<p>Your Part 2 accumulated account balance is now <strong>{{ account_balance }}</strong>.</p>
 {{ formfields }}
 {{ if should_continue }}
 <p>The interaction continues to another round.</p>

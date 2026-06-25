@@ -126,14 +126,29 @@ And for Part 1:
 
 ## Run locally
 
+You need **Python 3.9–3.11** installed first (oTree 5.x does not support Python
+3.12 or newer). Clone the repository and move into the project folder — the one
+that contains `settings.py` (`trust-game/otree_trust_game`). Every command below
+is run from inside that folder.
+
+```bash
+git clone https://github.com/Annawolf0128/trust-game.git
+cd trust-game/otree_trust_game
+```
+
+Create a virtual environment, install the dependencies, and start the server:
+
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 otree devserver
 ```
 
-Then open `http://localhost:8000` and pick a session from the list above.
+Then open `http://localhost:8000` and pick a session from the list above. The
+database (`db.sqlite3`) is created automatically on first launch; if you ever
+hit a database error, run `otree resetdb` once and then `otree devserver` again.
+Press `Ctrl+C` to stop the server.
 
 To run the automated bot tests for a config:
 

@@ -128,12 +128,12 @@ And for Part 1:
 
 You need **Python 3.9–3.11** installed first (oTree 5.x does not support Python
 3.12 or newer). Clone the repository and move into the project folder — the one
-that contains `settings.py` (`trust-game/otree_trust_game`). Every command below
-is run from inside that folder.
+that contains `settings.py`. After cloning, that folder is simply `trust-game`
+(`settings.py` sits at its top level). Every command below is run from inside it.
 
 ```bash
 git clone https://github.com/Annawolf0128/trust-game.git
-cd trust-game/otree_trust_game
+cd trust-game
 ```
 
 Create a virtual environment, install the dependencies, and start the server:

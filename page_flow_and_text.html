@@ -105,9 +105,9 @@
 
 <b>2. Part 1 / Stage 1 (rounds 1–3, repeated each round, identical text across all cells)</b>
 <ol>
-  <li><span class="tag t-p1">A</span> chooses an amount to send on Stage1Transfer → B is on a wait page</li>
+  <li><span class="tag t-p1">A</span> chooses an amount to send <b>and reports a belief about B's return</b> on Stage1Transfer → meanwhile <span class="tag t-p2">B</span> first reports a belief about A's send on Stage1TransferBelief (before learning it), then is on a wait page</li>
   <li><span class="tag t-p2">B</span> chooses an amount to return on Stage1Return → A is on a wait page</li>
-  <li><span class="tag t-both">Both</span> see Stage1Results (both decisions and round payoffs, added to the Part 1 account)</li>
+  <li><span class="tag t-both">Both</span> see Stage1Results (each player sees only their own decision, own round payoff, and own Part 1 account balance)</li>
 </ol>
 
 <b>3. Entering Part 2 (round 4 only, i.e. STAGE1_ROUNDS+1)</b>
@@ -120,9 +120,9 @@
 <b>4. Part 2 decision rounds (rounds 4–27, repeated each round, may end early by random stopping)</b>
 <ol>
   <li>From round 5 on, each round begins with a Stage2StateWait sync page (round 4 has none)</li>
-  <li><span class="tag t-p1">A</span> sends on Stage2Transfer (reinvestment cells add an "use accumulated account" field) + reports a belief about B's return → B is on a wait page</li>
-  <li><span class="tag t-p2">B</span> returns on Stage2Return + reports a belief about A's transfer → A is on a wait page</li>
-  <li><span class="tag t-both">Both</span> see Stage2Results (under noise cells, only <span class="tag t-p1">A</span> answers an extra signal_attribution question on this page)</li>
+  <li><span class="tag t-p1">A</span> sends on Stage2Transfer (reinvestment cells add an "use accumulated account" field) + reports a belief about B's return → meanwhile <span class="tag t-p2">B</span> first reports a belief about A's send on Stage2TransferBelief (before learning it), then is on a wait page</li>
+  <li><span class="tag t-p2">B</span> returns on Stage2Return → A is on a wait page</li>
+  <li><span class="tag t-both">Both</span> see Stage2Results (each player sees only their own payoff and own Part 2 account; under noise cells, only <span class="tag t-p1">A</span> additionally answers a numeric posterior question about B's actual return plus a signal_attribution question on this page)</li>
   <li>The bottom of the page indicates whether the pair "continues" or "has stopped"</li>
 </ol>
 
@@ -226,23 +226,35 @@ In each round, each player will see the other player's decision and both players
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Stage1Transfer<span class="fname">Stage1Transfer.html</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 1: round {{ stage1_round }} of {{ stage1_rounds }}</span>You have {{ endowment }} this round.
+    <div class="verbatim"><span class="ttl">Part 1: round {{ stage1_round }} of {{ stage1_rounds }}</span>Your Part 1 accumulated account at the start of this round is {{ account }}. You also receive a current-period endowment of {{ endowment }} for this round.
 
-The amount you send will be multiplied by {{ multiplier }}.
+You can send any amount from 0 to {{ endowment }} points. The amount you send will be multiplied by {{ multiplier }}.
 
 player 2 receives = amount you send x {{ multiplier }}
 
 your earnings = points you keep + points returned by player 2</div>
     <div class="field">transfer — "Amount to send" (between 0 and the endowment)</div>
+    <div class="field">belief_partner_intended_return — "How many points do you think player 2 will return to you this round?" (capped at transfer × multiplier)</div>
+  </div>
+</div>
+
+<div class="pagebox">
+  <div class="head"><span class="tag t-p2">B</span>Stage1TransferBelief<span class="fname">Stage1TransferBelief.html</span><span class="small">(B only · before learning A's send)</span></div>
+  <div class="body"><div class="verbatim"><span class="ttl">Part 1: round {{ stage1_round }} of {{ stage1_rounds }}</span>Your Part 1 accumulated account at the start of this round is {{ account }}.
+Player 1 receives a current-period endowment of {{ endowment }} and chooses how many points to send to you. Any amount sent is multiplied by {{ multiplier }}.
+Before you learn player 1's decision, please tell us what you expect.</div>
+    <div class="field">belief_partner_transfer — "How many points do you think player 1 chose to send to you this round?" (capped at the endowment)</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p2">B</span>Stage1Return<span class="fname">Stage1Return.html</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 1: round {{ stage1_round }} of {{ stage1_rounds }}</span>In this round, player 1 sent {{ transfer }} to you. This amount was multiplied by {{ multiplier }}, so you received {{ multiplied_amount }}.
+    <div class="verbatim"><span class="ttl">Part 1: round {{ stage1_round }} of {{ stage1_rounds }}</span>Your Part 1 accumulated account at the start of this round is {{ account }}.
 
-You may return any amount from 0 to {{ max_return }} to player 1.
+In this round, player 1 sent {{ transfer }} to you. This amount was multiplied by {{ multiplier }}, so you received {{ multiplied_amount }}.
+
+You may return any amount from 0 to {{ max_return }} points to player 1.
 
 your earnings = multiplied amount you received - points you return to player 1</div>
     <div class="field">intended_return — "Amount to return"</div>
@@ -255,13 +267,12 @@ your earnings = multiplied amount you received - points you return to player 1</
     <p class="note">Branch A sees (view_as_p1):</p>
     <div class="verbatim"><span class="ttl">Part 1 Results</span>You sent {{ player.transfer }} and player 2 returned {{ player.realized_return }}.
 Your payoff this round is {{ player.round_payoff }}.
-Player 2's payoff this round is {{ partner.round_payoff }}.
 Your Part 1 accumulated account balance is now {{ account_balance }}.</div>
     <p class="note">Branch B sees:</p>
     <div class="verbatim"><span class="ttl">Part 1 Results</span>In this round, player 1 sent {{ partner.transfer }}. You returned {{ player.intended_return }}.
 Your payoff this round is {{ player.round_payoff }}.
-Player 1's payoff this round is {{ partner.round_payoff }}.
 Your Part 1 accumulated account balance is now {{ account_balance }}.</div>
+    <p class="small">Each player sees only their own payoff and own Part 1 account balance — the partner's payoff is not shown.</p>
   </div>
 </div>
 
@@ -291,7 +302,7 @@ Waiting for player 1's decision.
 <div class="chips"><b>A's Part 2 path:</b></div>
 <div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 <div class="chips"><b>B's Part 2 path:</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2TransferBelief <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Part 2 rules<span class="fname">Stage2InstructionsNoReinvestmentNoNoiseP1.html</span></div>
@@ -332,52 +343,62 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html (no-noise branch)</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
-
-For the second question, suppose player 2 returns 4 points to you this round.</div>
+    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.</div>
     <div class="field">part2_quiz_p1_account — "In your Part 2 rules, can you use points from your accumulated account in the current round?" (Yes / No; correct answer in this cell: No)</div>
-    <div class="field">part2_quiz_p1_realized_return — "How many points reach you?"</div>
+    <div class="field">part2_quiz_p1_multiplier — "If you send 4 points to player 2, how many points does player 2 receive?" (1 / 4 / 7 / 12; correct: 12)</div>
+    <p class="note">Scenario shown before the next question: "For the next question, suppose player 2 chooses to return 4 points to you."</p>
+    <div class="field">part2_quiz_p1_realized_return — "How many points reach you?" (2 / 4 / 6 / 12; no noise → correct: 4)</div>
+    <div class="field">part2_quiz_p1_maxsend — "What is the most you can send to player 2 in a round?" (correct: "Only your current-period endowment")</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html (no-noise branch)</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
-
-For the second question, suppose you return 4 points to player 1 this round.</div>
+    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.</div>
     <div class="field">part2_quiz_p2_account — "In your Part 2 rules, can the points sent to you include points from player 1's accumulated account?" (Yes / No; correct answer in this cell: No)</div>
-    <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?"</div>
+    <div class="field">part2_quiz_p2_multiplier — "If player 1 sends 4 points to you, how many points do you receive?" (1 / 4 / 7 / 12; correct: 12)</div>
+    <p class="note">Scenario shown before the next question: "For the next question, suppose you choose to return 4 points to player 1."</p>
+    <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?" (2 / 4 / 6 / 12; no noise → correct: 4)</div>
+    <div class="field">part2_quiz_p2_maxsend — "What is the most player 1 can send to you in a round?" (correct: "Only player 1's current-period endowment")</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html (no-reinvestment / no-noise branch)</span></div>
-  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>You have a current-period endowment of {{ endowment }}. Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ safe_account }}. You also receive a current-period endowment of {{ endowment }} for this round.
 
-You choose how many points to send from the current-period endowment. Your Part 2 accumulated account balance cannot be used in this round.
+You can send any amount from 0 to {{ max_send }} points (your current-period endowment). Your accumulated account cannot be used in this round.
 
-amount sent to player 2 = points sent from current-period endowment
-
-amount player 2 receives = amount sent to player 2 x {{ C.MULTIPLIER }}
+amount player 2 receives = amount you send x {{ C.MULTIPLIER }}
 
 Player 2 receives the full multiplied amount and then chooses how many points to return to you.</div>
-    <div class="field">transfer — "Amount to send"</div>
+    <div class="field">amount_sent — "Amount to send" (single input box; in this cell capped at the endowment)</div>
     <div class="field">belief_partner_intended_return — "How many points do you think player 2 will return to you this round?"</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (no-noise branch)</span></div>
-  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>In this round, you received {{ received_amount }}.
+  <div class="head"><span class="tag t-p2">B</span>Stage2TransferBelief<span class="fname">Stage2TransferBelief.html</span><span class="small">(B only · before learning A's send)</span></div>
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ account }}.
+Player 1 may send up to {{ max_send }} points to you this round (their current-period endowment).
+Before you learn player 1's decision, please tell us what you expect.</div>
+    <div class="field">belief_partner_transfer — "How many points do you think player 1 chose to send to you this round?" (capped at the max player 1 can send)</div>
+  </div>
+</div>
 
-You may choose how many points to return, from 0 to {{ max_return }}.
+<div class="pagebox">
+  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (no-noise branch)</span></div>
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ account }}.
+
+In this round, you received {{ received_amount }}.
+
+You may choose how many points to return, from 0 to {{ max_return }} points.
 
 player 1 receives = return chosen by you
 
 your earnings = amount you received - return chosen by you</div>
     <div class="field">intended_return — "Amount to return"</div>
-    <div class="field">belief_partner_transfer — "How many points do you think player 1 chose to send to you this round?"</div>
   </div>
 </div>
 
@@ -411,7 +432,7 @@ Your Part 2 accumulated account balance is now {{ account_balance }}.
 <div class="chips"><b>A's Part 2 path:</b></div>
 <div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results<b> (answers attribution question)</b>] <span class="arrow">→ …</span></div>
 <div class="chips"><b>B's Part 2 path:</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsNoReinvestmentNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2TransferBelief <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Part 2 rules<span class="fname">Stage2InstructionsNoReinvestmentNoiseP1.html</span></div>
@@ -450,67 +471,78 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html (noise branch)</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
-
-For the second question, suppose player 2 returns 4 points to you this round, and the computer adjustment for this round is x0.5.</div>
+    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.</div>
     <div class="field">part2_quiz_p1_account — "…can you use points from your accumulated account…?" (correct answer: No)</div>
+    <div class="field">part2_quiz_p1_multiplier — "If you send 4 points to player 2, how many points does player 2 receive?" (correct: 12)</div>
+    <p class="note">Scenario shown before the next question: "For the next question, suppose player 2 chooses to return 4 points to you, and the computer adjustment for this round is x0.5."</p>
     <div class="field">part2_quiz_p1_realized_return — "How many points reach you?" (noise ×0.5 → correct answer: 2)</div>
+    <div class="field">part2_quiz_p1_maxsend — "What is the most you can send to player 2 in a round?" (correct: "Only your current-period endowment")</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html (noise branch)</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
-
-For the second question, suppose you return 4 points to player 1 this round, and the computer adjustment for this round is x0.5.</div>
+    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.</div>
     <div class="field">part2_quiz_p2_account — "…can the points sent to you include points from player 1's accumulated account?" (correct answer: No)</div>
+    <div class="field">part2_quiz_p2_multiplier — "If player 1 sends 4 points to you, how many points do you receive?" (correct: 12)</div>
+    <p class="note">Scenario shown before the next question: "For the next question, suppose you choose to return 4 points to player 1, and the computer adjustment for this round is x0.5."</p>
     <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?" (correct answer: 2)</div>
+    <div class="field">part2_quiz_p2_maxsend — "What is the most player 1 can send to you in a round?" (correct: "Only player 1's current-period endowment")</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html (no-reinvestment / noise branch)</span></div>
-  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>You have a current-period endowment of {{ endowment }}. Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ safe_account }}. You also receive a current-period endowment of {{ endowment }} for this round.
 
-You choose how many points to send from the current-period endowment. Your Part 2 accumulated account balance cannot be used in this round.
+You can send any amount from 0 to {{ max_send }} points (your current-period endowment). Your accumulated account cannot be used in this round.
 
-amount sent to player 2 = points sent from current-period endowment
-
-amount player 2 receives = amount sent to player 2 x {{ C.MULTIPLIER }}
+amount player 2 receives = amount you send x {{ C.MULTIPLIER }}
 
 Player 2 receives the full multiplied amount and then chooses how many points to return to you.
 
 The computer adjustment is then applied to the amount player 2 returns. You see only the final amount that reaches you, not the amount player 2 chose to return.</div>
-    <div class="field">transfer — "Amount to send"</div>
+    <div class="field">amount_sent — "Amount to send" (single input box; in this cell capped at the endowment)</div>
     <div class="field">belief_partner_intended_return — "How many points do you think player 2 will return to you this round?"</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (noise branch)</span></div>
-  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>In this round, you received {{ received_amount }}.
+  <div class="head"><span class="tag t-p2">B</span>Stage2TransferBelief<span class="fname">Stage2TransferBelief.html</span><span class="small">(B only · before learning A's send)</span></div>
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ account }}.
+Player 1 may send up to {{ max_send }} points to you this round (their current-period endowment).
+Before you learn player 1's decision, please tell us what you expect.</div>
+    <div class="field">belief_partner_transfer — "How many points do you think player 1 chose to send to you this round?" (capped at the max player 1 can send)</div>
+  </div>
+</div>
 
-You may choose how many points to return, from 0 to {{ max_return }}.
+<div class="pagebox">
+  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (noise branch)</span></div>
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ account }}.
+
+In this round, you received {{ received_amount }}.
+
+You may choose how many points to return, from 0 to {{ max_return }} points.
 
 The computer applies a random adjustment to the amount you return, and player 1 receives the adjusted amount.
 
 your earnings = amount you received - return chosen by you</div>
     <div class="field">intended_return — "Amount to return"</div>
-    <div class="field">belief_partner_transfer — "How many points do you think player 1 chose to send to you this round?"</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-both">Both</span>Stage2Results<span class="fname">Stage2Results.html (no-reinvestment / noise)</span></div>
   <div class="body">
-    <p class="note">Branch A sees (under noise, A answers an extra attribution question):</p>
+    <p class="note">Branch A sees (under noise, A answers two extra questions on this page):</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>You sent {{ player.transfer }} from the current endowment.
 The amount player 2 received was {{ received_amount }}.
 The amount that reached you from player 2 this round was {{ realized_return }}.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
 [one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
+    <div class="field">belief_partner_return_post (A only, noise only) — "Now that you have seen the amount that reached you, how many points do you think player 2 actually chose to return this round?" (capped at the amount player 2 received)</div>
     <div class="field">signal_attribution (A only, noise only) — "To what extent did the amount that reached you reflect player 2's chosen return rather than the computer adjustment? (0 - entirely the computer adjustment, 10 - entirely player 2's choice)"</div>
     <p class="note">Branch B sees (no answer field):</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>The final amount you received was {{ player.received_amount }}.
@@ -529,9 +561,9 @@ Your Part 2 accumulated account balance is now {{ account_balance }}.
 </div>
 
 <div class="chips"><b>A's Part 2 path:</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer<b> (extra reinvestment field)</b> <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer<b> (single send box can draw on the account)</b> <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 <div class="chips"><b>B's Part 2 path:</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2TransferBelief <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Part 2 rules<span class="fname">Stage2InstructionsReinvestmentNoNoiseP1.html</span></div>
@@ -574,53 +606,62 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html (no-noise branch)</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
-
-For the second question, suppose player 2 returns 4 points to you this round.</div>
+    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.</div>
     <div class="field">part2_quiz_p1_account — "…can you use points from your accumulated account…?" (correct answer in this cell: Yes)</div>
+    <div class="field">part2_quiz_p1_multiplier — "If you send 4 points to player 2, how many points does player 2 receive?" (correct: 12)</div>
+    <p class="note">Scenario shown before the next question: "For the next question, suppose player 2 chooses to return 4 points to you."</p>
     <div class="field">part2_quiz_p1_realized_return — "How many points reach you?" (no noise → correct answer: 4)</div>
+    <div class="field">part2_quiz_p1_maxsend — "What is the most you can send to player 2 in a round?" (correct: "Your current-period endowment plus your accumulated account")</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html (no-noise branch)</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
-
-For the second question, suppose you return 4 points to player 1 this round.</div>
+    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.</div>
     <div class="field">part2_quiz_p2_account — "…can the points sent to you include points from player 1's accumulated account?" (correct answer in this cell: Yes)</div>
+    <div class="field">part2_quiz_p2_multiplier — "If player 1 sends 4 points to you, how many points do you receive?" (correct: 12)</div>
+    <p class="note">Scenario shown before the next question: "For the next question, suppose you choose to return 4 points to player 1."</p>
     <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?" (correct answer: 4)</div>
+    <div class="field">part2_quiz_p2_maxsend — "What is the most player 1 can send to you in a round?" (correct: "Player 1's current-period endowment plus their accumulated account")</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html (reinvestment / no-noise branch)</span></div>
-  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>You have a current-period endowment of {{ endowment }}. Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ safe_account }}. You also receive a current-period endowment of {{ endowment }} for this round.
 
-You choose how many points to send from the current-period endowment and how many points to use from the Part 2 accumulated account.
+You can send any amount from 0 to {{ max_send }} points (your current-period endowment plus your accumulated account).
 
-amount sent to player 2 = points sent from current-period endowment + points used from Part 2 accumulated account
-
-amount player 2 receives = amount sent to player 2 x {{ C.MULTIPLIER }}
+amount player 2 receives = amount you send x {{ C.MULTIPLIER }}
 
 Player 2 receives the full multiplied amount and then chooses how many points to return to you.</div>
-    <div class="field">reinvestment — "Amount from Part 2 accumulated account to use this round" (appears only in reinvestment cells)</div>
-    <div class="field">transfer — "Amount to send"</div>
+    <div class="field">amount_sent — "Amount to send" (single input box; in reinvestment cells the cap is endowment + accumulated account, and any amount above the endowment is drawn from the account automatically)</div>
     <div class="field">belief_partner_intended_return — "How many points do you think player 2 will return to you this round?"</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (no-noise branch)</span></div>
-  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>In this round, you received {{ received_amount }}.
+  <div class="head"><span class="tag t-p2">B</span>Stage2TransferBelief<span class="fname">Stage2TransferBelief.html</span><span class="small">(B only · before learning A's send · reinvestment text)</span></div>
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ account }}.
+Player 1 may send up to {{ max_send }} points to you this round (a current-period endowment of {{ endowment }} plus their accumulated account).
+Before you learn player 1's decision, please tell us what you expect.</div>
+    <div class="field">belief_partner_transfer — "How many points do you think player 1 chose to send to you this round?" (capped at the max player 1 can send)</div>
+  </div>
+</div>
 
-You may choose how many points to return, from 0 to {{ max_return }}.
+<div class="pagebox">
+  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (no-noise branch)</span></div>
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ account }}.
+
+In this round, you received {{ received_amount }}.
+
+You may choose how many points to return, from 0 to {{ max_return }} points.
 
 player 1 receives = return chosen by you
 
 your earnings = amount you received - return chosen by you</div>
     <div class="field">intended_return — "Amount to return"</div>
-    <div class="field">belief_partner_transfer — "How many points do you think player 1 chose to send to you this round?"</div>
   </div>
 </div>
 
@@ -653,9 +694,9 @@ Your Part 2 accumulated account balance is now {{ account_balance }}.
 </div>
 
 <div class="chips"><b>A's Part 2 path:</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer<b> (extra reinvestment field)</b> <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results<b> (answers attribution question)</b>] <span class="arrow">→ …</span></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoise<b>P1</b> <span class="arrow">→</span> Stage2QuizP1 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2Transfer<b> (single send box can draw on the account)</b> <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Results<b> (answers attribution question)</b>] <span class="arrow">→ …</span></div>
 <div class="chips"><b>B's Part 2 path:</b></div>
-<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
+<div class="path">Stage2SetupWait <span class="arrow">→</span> Stage2InstructionsReinvestmentNoise<b>P2</b> <span class="arrow">→</span> Stage2QuizP2 <span class="arrow">→</span> [each round: (from round 5) Stage2StateWait <span class="arrow">→</span> Stage2TransferBelief <span class="arrow">→</span> wait <span class="arrow">→</span> Stage2Return <span class="arrow">→</span> Stage2Results] <span class="arrow">→ …</span></div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Part 2 rules<span class="fname">Stage2InstructionsReinvestmentNoiseP1.html</span></div>
@@ -698,62 +739,71 @@ Part 2 lasts for at least {{ min_rounds }} rounds. After round {{ min_rounds }},
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Part 2 Quiz<span class="fname">Stage2QuizP1.html (noise branch)</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
-
-For the second question, suppose player 2 returns 4 points to you this round, and the computer adjustment for this round is x0.5.</div>
+    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.</div>
     <div class="field">part2_quiz_p1_account — "…can you use points from your accumulated account…?" (correct answer: Yes)</div>
+    <div class="field">part2_quiz_p1_multiplier — "If you send 4 points to player 2, how many points does player 2 receive?" (correct: 12)</div>
+    <p class="note">Scenario shown before the next question: "For the next question, suppose player 2 chooses to return 4 points to you, and the computer adjustment for this round is x0.5."</p>
     <div class="field">part2_quiz_p1_realized_return — "How many points reach you?" (noise ×0.5 → correct answer: 2)</div>
+    <div class="field">part2_quiz_p1_maxsend — "What is the most you can send to player 2 in a round?" (correct: "Your current-period endowment plus your accumulated account")</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p2">B</span>Part 2 Quiz<span class="fname">Stage2QuizP2.html (noise branch)</span></div>
   <div class="body">
-    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.
-
-For the second question, suppose you return 4 points to player 1 this round, and the computer adjustment for this round is x0.5.</div>
+    <div class="verbatim"><span class="ttl">Part 2 Quiz</span>Please answer these questions before Part 2 begins.</div>
     <div class="field">part2_quiz_p2_account — "…can the points sent to you include points from player 1's accumulated account?" (correct answer: Yes)</div>
+    <div class="field">part2_quiz_p2_multiplier — "If player 1 sends 4 points to you, how many points do you receive?" (correct: 12)</div>
+    <p class="note">Scenario shown before the next question: "For the next question, suppose you choose to return 4 points to player 1, and the computer adjustment for this round is x0.5."</p>
     <div class="field">part2_quiz_p2_realized_return — "How many points reach player 1?" (correct answer: 2)</div>
+    <div class="field">part2_quiz_p2_maxsend — "What is the most player 1 can send to you in a round?" (correct: "Player 1's current-period endowment plus their accumulated account")</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-p1">A</span>Stage2Transfer<span class="fname">Stage2Transfer.html (reinvestment / noise branch)</span></div>
-  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>You have a current-period endowment of {{ endowment }}. Your Part 2 accumulated account at the start of this round is {{ safe_account }}.
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ safe_account }}. You also receive a current-period endowment of {{ endowment }} for this round.
 
-You choose how many points to send from the current-period endowment and how many points to use from the Part 2 accumulated account.
+You can send any amount from 0 to {{ max_send }} points (your current-period endowment plus your accumulated account).
 
-amount sent to player 2 = points sent from current-period endowment + points used from Part 2 accumulated account
-
-amount player 2 receives = amount sent to player 2 x {{ C.MULTIPLIER }}
+amount player 2 receives = amount you send x {{ C.MULTIPLIER }}
 
 Player 2 receives the full multiplied amount and then chooses how many points to return to you.
 
 The computer adjustment is then applied to the amount player 2 returns. You see only the final amount that reaches you, not the amount player 2 chose to return.</div>
-    <div class="field">reinvestment — "Amount from Part 2 accumulated account to use this round"</div>
-    <div class="field">transfer — "Amount to send"</div>
+    <div class="field">amount_sent — "Amount to send" (single input box; in reinvestment cells the cap is endowment + accumulated account, and any amount above the endowment is drawn from the account automatically)</div>
     <div class="field">belief_partner_intended_return — "How many points do you think player 2 will return to you this round?"</div>
   </div>
 </div>
 
 <div class="pagebox">
-  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (noise branch)</span></div>
-  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>In this round, you received {{ received_amount }}.
+  <div class="head"><span class="tag t-p2">B</span>Stage2TransferBelief<span class="fname">Stage2TransferBelief.html</span><span class="small">(B only · before learning A's send · reinvestment text)</span></div>
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ account }}.
+Player 1 may send up to {{ max_send }} points to you this round (a current-period endowment of {{ endowment }} plus their accumulated account).
+Before you learn player 1's decision, please tell us what you expect.</div>
+    <div class="field">belief_partner_transfer — "How many points do you think player 1 chose to send to you this round?" (capped at the max player 1 can send)</div>
+  </div>
+</div>
 
-You may choose how many points to return, from 0 to {{ max_return }}.
+<div class="pagebox">
+  <div class="head"><span class="tag t-p2">B</span>Stage2Return<span class="fname">Stage2Return.html (noise branch)</span></div>
+  <div class="body"><div class="verbatim"><span class="ttl">Part 2: round {{ stage2_round }}</span>Your Part 2 accumulated account at the start of this round is {{ account }}.
+
+In this round, you received {{ received_amount }}.
+
+You may choose how many points to return, from 0 to {{ max_return }} points.
 
 The computer applies a random adjustment to the amount you return, and player 1 receives the adjusted amount.
 
 your earnings = amount you received - return chosen by you</div>
     <div class="field">intended_return — "Amount to return"</div>
-    <div class="field">belief_partner_transfer — "How many points do you think player 1 chose to send to you this round?"</div>
   </div>
 </div>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-both">Both</span>Stage2Results<span class="fname">Stage2Results.html (reinvestment / noise)</span></div>
   <div class="body">
-    <p class="note">Branch A sees (reinvestment adds the account line; under noise, A answers the attribution question):</p>
+    <p class="note">Branch A sees (reinvestment adds the account line; under noise, A answers two extra questions on this page):</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>You sent {{ player.transfer }} from the current endowment.
 You used {{ player.reinvestment }} from your Part 2 accumulated account.
 The amount player 2 received was {{ received_amount }}.
@@ -761,6 +811,7 @@ The amount that reached you from player 2 this round was {{ realized_return }}.
 Your payoff this round is {{ player.round_payoff }}.
 Your Part 2 accumulated account balance is now {{ account_balance }}.
 [one of two endings] The interaction continues to another round. / The interaction has stopped.</div>
+    <div class="field">belief_partner_return_post (A only, noise only) — "Now that you have seen the amount that reached you, how many points do you think player 2 actually chose to return this round?" (capped at the amount player 2 received)</div>
     <div class="field">signal_attribution (A only, noise only) — "To what extent did the amount that reached you reflect player 2's chosen return rather than the computer adjustment? (0 - entirely the computer adjustment, 10 - entirely player 2's choice)"</div>
     <p class="note">Branch B sees (no answer field):</p>
     <div class="verbatim"><span class="ttl">Part 2 Results</span>The final amount you received was {{ player.received_amount }}.

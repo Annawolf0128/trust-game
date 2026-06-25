@@ -80,62 +80,18 @@
 <div class="legend">
   <b>Contents</b>
   <div class="toc">
-    <a href="#logic">1. Overall page logic</a><br>
-    <a href="#shared1">2. Shared pages (Part 1 + Stage 1, identical across cells)</a><br>
-    <a href="#cells">3. Part 2 pages for the four cells</a><br>
+    <a href="#shared1">1. Shared pages (Part 1 + Stage 1, identical across cells)</a><br>
+    <a href="#cells">2. Part 2 pages for the four cells</a><br>
     <a href="#c1">　Cell 1 · no_reinvestment × no_noise</a><br>
     <a href="#c2">　Cell 2 · no_reinvestment × noise</a><br>
     <a href="#c3">　Cell 3 · reinvestment × no_noise</a><br>
     <a href="#c4">　Cell 4 · reinvestment × noise</a><br>
-    <a href="#shared2">4. Closing shared pages (survey + settlement)</a><br>
+    <a href="#shared2">3. Closing shared pages (survey + settlement)</a><br>
   </div>
 </div>
 
-<!-- ============ 1. Overall logic ============ -->
-<h2 id="logic">1. Overall page logic</h2>
-
-<p>All players share a single <code>page_sequence</code>, and each page uses <code>is_displayed</code> to decide who sees it and in which round. The experiment runs <b>27 rounds</b> through this one sequence: rounds 1–3 are Part 1, rounds 4–27 are Part 2 (with random stopping). The pages a given player actually sees are all the pages in this sequence that are "visible to them."</p>
-
-<div class="flow">
-<b>1. Opening (appears once, round 1 only)</b>
-<ol>
-  <li><span class="tag t-both">Both</span> Introduction → RoleAssignment</li>
-  <li>Branch by role: <span class="tag t-p1">A</span> sees Part1InstructionsP1 + Part1QuizP1; <span class="tag t-p2">B</span> sees Part1InstructionsP2 + Part1QuizP2</li>
-</ol>
-
-<b>2. Part 1 / Stage 1 (rounds 1–3, repeated each round, identical text across all cells)</b>
-<ol>
-  <li><span class="tag t-p1">A</span> chooses an amount to send <b>and reports a belief about B's return</b> on Stage1Transfer → meanwhile <span class="tag t-p2">B</span> first reports a belief about A's send on Stage1TransferBelief (before learning it), then is on a wait page</li>
-  <li><span class="tag t-p2">B</span> chooses an amount to return on Stage1Return → A is on a wait page</li>
-  <li><span class="tag t-both">Both</span> see Stage1Results (each player sees only their own decision, own round payoff, and own Part 1 account balance)</li>
-</ol>
-
-<b>3. Entering Part 2 (round 4 only, i.e. STAGE1_ROUNDS+1)</b>
-<ol>
-  <li><span class="tag t-both">Both</span> Stage2SetupWait (synchronizing wait page; here the system stratifies each pair by Stage 1 relationship quality and assigns it to one of the four cells)</li>
-  <li>Branch by <b>cell × role</b>: each person sees only the single Part 2 rules page for their cell and role (1 of 8)</li>
-  <li>By role: <span class="tag t-p1">A</span> sees Stage2QuizP1; <span class="tag t-p2">B</span> sees Stage2QuizP2</li>
-</ol>
-
-<b>4. Part 2 decision rounds (rounds 4–27, repeated each round, may end early by random stopping)</b>
-<ol>
-  <li>From round 5 on, each round begins with a Stage2StateWait sync page (round 4 has none)</li>
-  <li><span class="tag t-p1">A</span> sends on Stage2Transfer (reinvestment cells add an "use accumulated account" field) + reports a belief about B's return → meanwhile <span class="tag t-p2">B</span> first reports a belief about A's send on Stage2TransferBelief (before learning it), then is on a wait page</li>
-  <li><span class="tag t-p2">B</span> returns on Stage2Return → A is on a wait page</li>
-  <li><span class="tag t-both">Both</span> see Stage2Results (each player sees only their own payoff and own Part 2 account; under noise cells, only <span class="tag t-p1">A</span> additionally answers a numeric posterior question about B's actual return plus a signal_attribution question on this page)</li>
-  <li>The bottom of the page indicates whether the pair "continues" or "has stopped"</li>
-</ol>
-
-<b>5. Closing (final round only, round 27)</b>
-<ol>
-  <li><span class="tag t-both">Both</span> Survey (demographics + preferences) → FinalResults (settlement of the two accounts combined)</li>
-</ol>
-</div>
-
-<p class="small"><b>Key point:</b> the only difference between the four cells is <b>Part 2</b> — specifically the Part 2 rules page, the Part 2 quiz, and the Part 2 send/return/results pages (text and fields). Part 1, Stage 1, the survey, and the settlement are identical across all cells. Section 2 below writes out the shared pages once; Section 3 covers only the Part 2 differences, cell by cell.</p>
-
-<!-- ============ 2. Shared pages ============ -->
-<h2 id="shared1">2. Shared pages (Part 1 + Stage 1 · identical across cells)</h2>
+<!-- ============ 1. Shared pages ============ -->
+<h2 id="shared1">1. Shared pages (Part 1 + Stage 1 · identical across cells)</h2>
 
 <h3>Opening (round 1 only)</h3>
 
@@ -289,7 +245,7 @@ Waiting for player 1's decision.
 </div>
 
 <!-- ============ 3. Part 2 for the four cells ============ -->
-<h2 id="cells">3. Part 2 pages for the four cells</h2>
+<h2 id="cells">2. Part 2 pages for the four cells</h2>
 <p class="small">For each cell below, the full Part 2 page path for <span class="tag t-p1">A</span> and <span class="tag t-p2">B</span> is given first (the opening and Stage 1 are the same as the previous section), followed by the cell-specific verbatim page text. The send/return/results pages contain conditional branches; only the branch actually rendered for that cell is shown.</p>
 
 <!-- ===== Cell 1 ===== -->
@@ -823,7 +779,7 @@ Your Part 2 accumulated account balance is now {{ account_balance }}.
 </div>
 
 <!-- ============ 4. Closing shared ============ -->
-<h2 id="shared2">4. Closing shared pages (survey + settlement · identical across cells)</h2>
+<h2 id="shared2">3. Closing shared pages (survey + settlement · identical across cells)</h2>
 
 <div class="pagebox">
   <div class="head"><span class="tag t-both">Both</span>Survey<span class="fname">Survey.html</span></div>

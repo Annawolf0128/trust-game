@@ -136,6 +136,7 @@ class Stage1Transfer(Page):
     @staticmethod
     def vars_for_template(player: Player):
         return dict(
+            account=cu(0),
             endowment=C.ENDOWMENT,
             multiplier=C.MULTIPLIER,
             stage1_round=1,
@@ -156,6 +157,7 @@ class Stage1Return(Page):
     @staticmethod
     def vars_for_template(player: Player):
         return dict(
+            account=cu(0),
             transfer=C.DEMO_TRANSFER,
             multiplied_amount=_MULTIPLIED,
             max_return=_MULTIPLIED,

@@ -108,6 +108,16 @@ time with a real pair:
 - **`trial_reinvestment_no_noise`** — forced `reinvestment` + `no_noise`.
 - **`trial_reinvestment_noise`** — forced `reinvestment` + `noise`.
 
+### AI-agent simulation session
+
+- **`ai_agent_trust_cycle`** — 8 bot participants (4 pairs), one pair per Stage 2
+  cell, using a rule-based `trust_cycle` strategy. This is a simulation tool, not
+  a human data-collection session. Player A increases exposure when realized
+  returns justify trust and, under reinvestment, can roll accumulated earnings
+  back into the same relationship. Player B reciprocates by returning about half
+  of what B receives. Use it to inspect whether the protocol permits a
+  self-reinforcing trust cycle before adding LLM-based agents.
+
 ### Preview sessions (single player, no partner)
 
 One-participant sessions to review participant-facing text without running a full
@@ -155,4 +165,5 @@ To run the automated bot tests for a config:
 ```bash
 otree test official 24
 otree test preview_reinvestment_noise 1
+otree test ai_agent_trust_cycle 8 --export
 ```

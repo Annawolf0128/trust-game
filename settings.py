@@ -19,6 +19,16 @@ SESSION_CONFIGS = [
         num_demo_participants=24,
         app_sequence=["trust_reinvestment"],
     ),
+    # Simulation session: oTree bots play as rule-based AI agents. This is for
+    # testing whether a trust-building strategy can sustain a high-trust cycle
+    # across the 2x2 Stage 2 design; it is not a human data-collection session.
+    dict(
+        name="ai_agent_trust_cycle",
+        display_name="AI Agent Simulation: trust-cycle strategy, all four cells",
+        num_demo_participants=8,
+        app_sequence=["trust_reinvestment"],
+        ai_agent_strategy="trust_cycle",
+    ),
     dict(
         name="trial_no_reinvestment_no_noise",
         display_name="Trial Cell: No reinvestment, no noise",

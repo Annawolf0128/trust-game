@@ -1,4 +1,4 @@
-from otree.api import Bot, Submission
+from otree.api import Bot, Submission, cu
 from . import (
     active_in_stage2,
     C,
@@ -28,7 +28,65 @@ from . import (
     Stage2Transfer,
     Stage2TransferBelief,
     Survey,
+    participant_part2_account,
+    uses_account_in_part2,
 )
+
+
+def ai_strategy_enabled(player):
+    return player.session.config.get("ai_agent_strategy") == "trust_cycle"
+
+
+def stage1_ai_transfer(player):
+    # Start with a clearly trusting but not maximal transfer, then gently
+    # increase. This creates positive relationship history before Stage 2.
+    return min(8, 6 + player.round_number)
+
+
+def stage1_ai_return(player):
+    player_a = player.group.get_player_by_id(1)
+    received = player_a.transfer * C.MULTIPLIER
+    # Return roughly 60% of what B received, capped by the available amount.
+    return min(received, cu(round(float(received) * 0.60)))
+
+
+def stage2_ai_amount_sent(player):
+    safe_account = participant_part2_account(player)
+    max_send = C.ENDOWMENT + safe_account if uses_account_in_part2(player) else C.ENDOWMENT
+    stage2_round = player.round_number - C.STAGE1_ROUNDS
+    if stage2_round == 1:
+        desired = 8 if uses_account_in_part2(player) else 7
+    else:
+        previous = player.in_round(player.round_number - 1)
+        previous_sent = float(previous.amount_sent or 0)
+        previous_realized = float(previous.realized_return or 0)
+        # If A got back at least as much as was risked, raise trust. If not,
+        # reduce exposure but avoid collapsing to zero after one noisy signal.
+        if previous_realized >= previous_sent:
+            desired = previous_sent + 2
+        elif previous_realized >= 0.6 * previous_sent:
+            desired = previous_sent
+        else:
+            desired = max(3, previous_sent - 2)
+        if uses_account_in_part2(player) and float(safe_account) > 15:
+            desired += min(4, float(safe_account) * 0.20)
+    return cu(min(float(max_send), round(desired)))
+
+
+def stage2_ai_return(player):
+    received = player.received_amount
+    # Strong reciprocity: returning half of the received amount keeps B ahead
+    # while usually letting A recover the amount risked, sustaining the cycle.
+    return min(received, cu(round(float(received) * 0.50)))
+
+
+def stage2_ai_attribution(player):
+    if player.round_number <= C.STAGE1_ROUNDS + 1:
+        return 5
+    previous = player.in_round(player.round_number - 1)
+    if float(previous.realized_return or 0) < float(previous.amount_sent or 0):
+        return 4 if player.group.noise_treatment == C.NOISE else 7
+    return 7
 
 
 def stage2_instruction_page(player):
@@ -47,6 +105,7 @@ def stage2_instruction_page(player):
 
 class PlayerBot(Bot):
     def play_round(self):
+        use_ai = ai_strategy_enabled(self.player)
         if self.round_number == 1:
             yield Introduction
             yield RoleAssignment
@@ -65,13 +124,18 @@ class PlayerBot(Bot):
 
         if self.round_number <= C.STAGE1_ROUNDS:
             if self.player.id_in_group == 1:
+                transfer = stage1_ai_transfer(self.player) if use_ai else 5
                 yield Stage1Transfer, dict(
-                    transfer=5,
-                    belief_partner_intended_return=6,
+                    transfer=transfer,
+                    belief_partner_intended_return=round(transfer * C.MULTIPLIER * 0.6) if use_ai else 6,
                 )
             else:
-                yield Stage1TransferBelief, dict(belief_partner_transfer=5)
-                yield Stage1Return, dict(intended_return=7)
+                yield Stage1TransferBelief, dict(
+                    belief_partner_transfer=stage1_ai_transfer(self.player) if use_ai else 5
+                )
+                yield Stage1Return, dict(
+                    intended_return=stage1_ai_return(self.player) if use_ai else 7
+                )
             yield Stage1Results
             return
 
@@ -103,17 +167,25 @@ class PlayerBot(Bot):
         pair_active = active_in_stage2(self.group)
         if pair_active:
             if self.player.id_in_group == 1:
+                amount_sent = stage2_ai_amount_sent(self.player) if use_ai else 4
                 yield Stage2Transfer, dict(
-                    amount_sent=4,
-                    belief_partner_intended_return=6,
+                    amount_sent=amount_sent,
+                    belief_partner_intended_return=round(float(amount_sent) * C.MULTIPLIER * 0.5),
                 )
             else:
-                yield Stage2TransferBelief, dict(belief_partner_transfer=4)
-                yield Stage2Return, dict(intended_return=6)
+                expected_transfer = (
+                    stage2_ai_amount_sent(self.player.group.get_player_by_id(1))
+                    if use_ai else 4
+                )
+                yield Stage2TransferBelief, dict(belief_partner_transfer=expected_transfer)
+                yield Stage2Return, dict(
+                    intended_return=stage2_ai_return(self.player) if use_ai else 6
+                )
             if self.group.noise_treatment == C.NOISE and self.player.id_in_group == 1:
+                player_b = self.group.get_player_by_id(2)
                 yield Stage2Results, dict(
-                    belief_partner_return_post=3,
-                    signal_attribution=5,
+                    belief_partner_return_post=round(min(float(self.player.realized_return), float(player_b.received_amount))),
+                    signal_attribution=stage2_ai_attribution(self.player) if use_ai else 5,
                 )
             else:
                 yield Stage2Results

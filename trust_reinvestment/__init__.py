@@ -1084,10 +1084,16 @@ class FinalResults(Page):
 
     @staticmethod
     def vars_for_template(player: Player):
+        total_payoff = participant_total_account(player)
+        payment_rate = float(
+            player.session.config.get("real_world_currency_per_point", 0)
+        )
         return dict(
             part1_account=participant_part1_account(player),
             part2_account=participant_part2_account(player),
-            total_payoff=participant_total_account(player),
+            total_payoff=total_payoff,
+            payment_rate=f"${payment_rate:.2f}",
+            final_payment_usd=f"${float(total_payoff) * payment_rate:.2f}",
         )
 
 

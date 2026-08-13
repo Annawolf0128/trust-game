@@ -1,33 +1,33 @@
 from os import environ
 
 SESSION_CONFIG_DEFAULTS = dict(
-    real_world_currency_per_point=0.10,
-    participation_fee=0.00,
+    # Parts 1 and 2 use the same exchange rate.
+    real_world_currency_per_point=0.50,
+    participation_fee=5.00,
     doc="Two-person allocation task",
 )
 
 SESSION_CONFIGS = [
-    # Official session: every session contains all four 2x2 cells. 24
-    # participants (12 pairs) are paired on arrival and play Stage 1; at the
-    # start of Stage 2 the 12 pairs are split 3-per-cell, stratified by Stage 1
-    # relationship quality (see assign_stage2_treatments). Running every cell in
-    # every session keeps session orthogonal to treatment instead of confounded
-    # with it.
+    # Official session: 24 participants are assigned random roles and random
+    # partners, forming 12 pairs. The pairs are then randomized across the four
+    # Part 2 cells with exactly 3 pairs per cell. Part 1 choices are retained as
+    # analysis covariates but never affect roles, matches, or cell assignment.
     dict(
         name="official",
-        display_name="Official: 12 pairs, all four cells",
+        display_name="OFFICIAL — 24 participants, four balanced blocks",
         num_demo_participants=24,
         app_sequence=["trust_reinvestment"],
     ),
-    # Simulation session: oTree bots play as rule-based AI agents. This is for
-    # testing whether a trust-building strategy can sustain a high-trust cycle
-    # across the 2x2 Stage 2 design; it is not a human data-collection session.
+    # Small complete session: 8 participants form 4 random pairs, with exactly
+    # one pair assigned to each Part 2 treatment cell.
     dict(
-        name="ai_agent_trust_cycle",
-        display_name="AI Agent Simulation: trust-cycle strategy, all four cells",
+        name="pilot_8",
+        display_name="PILOT — 8 participants, one pair per block",
         num_demo_participants=8,
         app_sequence=["trust_reinvestment"],
-        ai_agent_strategy="trust_cycle",
+        # Keep the participant-facing random-stopping instructions unchanged,
+        # but make this compact pilot finish after its fifth Part 2 round.
+        fixed_stage2_rounds=5,
     ),
     dict(
         name="trial_no_reinvestment_no_noise",
@@ -61,49 +61,31 @@ SESSION_CONFIGS = [
         forced_treatment="reinvestment",
         forced_noise="noise",
     ),
-    # Preview only: single player, no Part 1, no waiting, no partner. One session
-    # per 2x2 cell -- walk both roles through that cell's Part 2 instructions,
-    # send/return decision screens, both results screens, then the survey.
-    dict(
-        name="preview_no_reinvestment_no_noise",
-        display_name="Preview: Part 2 (No reinvestment, no noise) + survey",
-        num_demo_participants=1,
-        app_sequence=["preview_part2"],
-        preview_treatment="no_reinvestment",
-        preview_noise="no_noise",
-    ),
-    dict(
-        name="preview_no_reinvestment_noise",
-        display_name="Preview: Part 2 (No reinvestment, noise) + survey",
-        num_demo_participants=1,
-        app_sequence=["preview_part2"],
-        preview_treatment="no_reinvestment",
-        preview_noise="noise",
-    ),
-    dict(
-        name="preview_reinvestment_no_noise",
-        display_name="Preview: Part 2 (Reinvestment, no noise) + survey",
-        num_demo_participants=1,
-        app_sequence=["preview_part2"],
-        preview_treatment="reinvestment",
-        preview_noise="no_noise",
-    ),
-    dict(
-        name="preview_reinvestment_noise",
-        display_name="Preview: Part 2 (Reinvestment, noise) + survey",
-        num_demo_participants=1,
-        app_sequence=["preview_part2"],
-        preview_treatment="reinvestment",
-        preview_noise="noise",
-    ),
-    # Preview only: single player, no partner, no waiting. Click straight through
-    # every Part 1 page (intro, role, rules, quizzes, send/return, results).
-    dict(
-        name="preview_part1",
-        display_name="Preview: Part 1 pages (no play-through)",
-        num_demo_participants=1,
-        app_sequence=["preview_part1"],
-    ),
+    # Fast, single-participant full-flow tests. Each path starts in Part 1,
+    # then continues into its specified Part 2 cell and role. Counterpart
+    # decisions are simulated so these paths never wait for another browser.
+    *[
+        dict(
+            name=f"test_{treatment}_{noise}_player{role}",
+            display_name=(
+                f"TEST — {'Reinvestment' if treatment == 'reinvestment' else 'No reinvestment'}, "
+                f"{'noise' if noise == 'noise' else 'no noise'}, Player {role}"
+            ),
+            num_demo_participants=1,
+            app_sequence=["preview_part1", "preview_part2"],
+            preview_treatment=treatment,
+            preview_noise=noise,
+            preview_role=role,
+            fast_role_test=True,
+        )
+        for treatment, noise in [
+            ("no_reinvestment", "no_noise"),
+            ("no_reinvestment", "noise"),
+            ("reinvestment", "no_noise"),
+            ("reinvestment", "noise"),
+        ]
+        for role in [1, 2]
+    ],
 ]
 
 LANGUAGE_CODE = "en"

@@ -1,0 +1,55 @@
+{{ block title }}{{ endblock }}
+{{ block content }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell">
+    <div class="response-head"><div class="response-pill">PART 1</div><div class="response-title">Understanding test</div><div class="response-count">Before the questions</div></div>
+    <div class="response-stage compact">
+        <div class="response-lines">
+            <div class="response-line">This test checks your understanding of the Part 1 rules.</div>
+            <div class="response-line">Your answers to this test <strong class="value-yellow">do not affect your payoff</strong>.</div>
+            <div class="response-line">You must answer all three questions correctly before continuing.</div>
+        </div>
+    </div>
+    <div class="response-form">
+        {{ if form.errors }}
+        <div class="quiz-error-summary" role="alert" aria-live="assertive">
+            <div class="quiz-error-title">Some answers are incorrect.</div>
+            <div class="quiz-error-copy">Please review the questions marked below and try again.</div>
+        </div>
+        {{ endif }}
+        <div class="quiz-form-heading">
+            <div class="response-form-title">Use the same example for all three questions</div>
+            <button type="button" class="quiz-review-button" data-rule-review-open="part1-rule-review">Review game rules</button>
+        </div>
+        <div class="part1-example">
+            <div class="part1-flow"><div class="part1-step">Player 1 starts with 10</div><div class="part1-arrow">→</div><div class="part1-step">Sends 4</div><div class="part1-arrow">× 3</div><div class="part1-step orange">Player 2 receives ?</div><div class="part1-arrow">→</div><div class="part1-step orange">Returns 5</div></div>
+        </div>
+        <div class="quiz-grid">
+            <div class="response-field blue"><div class="quiz-question-number">Question 1</div>{{ formfield 'part1_quiz_p1_multiplied' }}</div>
+            <div class="response-field blue"><div class="quiz-question-number">Question 2</div>{{ formfield 'part1_quiz_p1_payoff' }}</div>
+            <div class="response-field orange"><div class="quiz-question-number">Question 3</div>{{ formfield 'part1_quiz_p2_payoff' }}</div>
+        </div>
+        <div class="response-next"><button class="otree-btn-next btn btn-primary">Check answers and continue</button></div>
+    </div>
+    <div class="rules-review-overlay" id="part1-rule-review" data-rule-review-overlay hidden>
+        <div class="rules-review-dialog" role="dialog" aria-modal="true" aria-labelledby="part1-rule-review-title">
+            <div class="rules-review-head">
+                <div id="part1-rule-review-title" class="rules-review-title">Part 1 game rules</div>
+                <button type="button" class="rules-review-close" data-rule-review-close aria-label="Close rule review">×</button>
+            </div>
+            <div class="rules-review-body">
+                <div class="rules-review-item"><strong>1.</strong> Player 1 starts with <strong class="value-blue">10 points</strong>. Player 2 receives no initial endowment.</div>
+                <div class="rules-review-item"><strong>2.</strong> Player 1 chooses a whole number from <strong class="value-blue">0 to 10</strong> to send.</div>
+                <div class="rules-review-item"><strong>3.</strong> Player 2 receives <strong class="value-yellow">three times</strong> the amount Player 1 sent.</div>
+                <div class="rules-review-item"><strong>4.</strong> Player 2 chooses a whole-number amount to return, from 0 up to the amount received.</div>
+                <div class="rules-review-formula"><strong>Player 1 payoff</strong> = 10 − amount sent + amount returned</div>
+                <div class="rules-review-formula orange"><strong>Player 2 payoff</strong> = three times the amount sent − amount returned</div>
+                <div class="rules-review-item">Your role and matched participant are randomly assigned after you submit your Part 1 decisions.</div>
+            </div>
+            <div class="rules-review-actions"><button type="button" class="quiz-review-button primary" data-rule-review-close>Back to the questions</button></div>
+        </div>
+    </div>
+</div>
+<script src="{{ static 'trust_reinvestment/quiz_rule_review.js' }}"></script>
+<script>history.pushState(null,'',location.href);window.addEventListener('popstate',()=>history.go(1));</script>
+{{ endblock }}

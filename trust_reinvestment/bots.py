@@ -4,15 +4,14 @@ from . import (
     C,
     FinalResults,
     Introduction,
-    Part1InstructionsP1,
-    Part1InstructionsP2,
-    Part1QuizP1,
-    Part1QuizP2,
-    RoleAssignment,
-    Stage1Results,
-    Stage1Return,
-    Stage1Transfer,
-    Stage1TransferBelief,
+    Part1Instructions,
+    Part1QuestionsIntro,
+    Part1RulesIntro,
+    Part1ProposerDecision,
+    Part1Quiz,
+    Part1ResponderStrategy,
+    Part1Results,
+    Part2RoleAssignment,
     Stage2InstructionsNoReinvestmentNoNoiseP1,
     Stage2InstructionsNoReinvestmentNoNoiseP2,
     Stage2InstructionsNoReinvestmentNoiseP1,
@@ -23,10 +22,12 @@ from . import (
     Stage2InstructionsReinvestmentNoiseP2,
     Stage2QuizP1,
     Stage2QuizP2,
+    Stage2RoundIntro,
     Stage2Results,
     Stage2Return,
     Stage2Transfer,
     Stage2TransferBelief,
+    SurveyIntro,
     Survey,
     participant_part2_account,
     uses_account_in_part2,
@@ -37,17 +38,18 @@ def ai_strategy_enabled(player):
     return player.session.config.get("ai_agent_strategy") == "trust_cycle"
 
 
-def stage1_ai_transfer(player):
-    # Start with a clearly trusting but not maximal transfer, then gently
-    # increase. This creates positive relationship history before Stage 2.
-    return min(8, 6 + player.round_number)
+def part1_bot_offer(player):
+    return (player.id_in_subsession - 1) % 11
 
 
-def stage1_ai_return(player):
-    player_a = player.group.get_player_by_id(1)
-    received = player_a.transfer * C.MULTIPLIER
-    # Return roughly 60% of what B received, capped by the available amount.
-    return min(received, cu(round(float(received) * 0.60)))
+def part1_bot_returns(player):
+    # Alternate relatively low and high reciprocity schedules so automated
+    # sessions exercise a broad range of Part 1 pre-treatment responses.
+    fraction = 0.2 if player.id_in_subsession % 2 else 0.5
+    return {
+        f"part1_return_{offer}": round(C.MULTIPLIER * offer * fraction)
+        for offer in range(1, 11)
+    }
 
 
 def stage2_ai_amount_sent(player):
@@ -108,39 +110,24 @@ class PlayerBot(Bot):
         use_ai = ai_strategy_enabled(self.player)
         if self.round_number == 1:
             yield Introduction
-            yield RoleAssignment
-            if self.player.id_in_group == 1:
-                yield Part1InstructionsP1
-                yield Part1QuizP1, dict(
-                    part1_quiz_p1_multiplied=12,
-                    part1_quiz_p1_payoff=11,
-                )
-            else:
-                yield Part1InstructionsP2
-                yield Part1QuizP2, dict(
-                    part1_quiz_p2_received=12,
-                    part1_quiz_p2_payoff=7,
-                )
-
-        if self.round_number <= C.STAGE1_ROUNDS:
-            if self.player.id_in_group == 1:
-                transfer = stage1_ai_transfer(self.player) if use_ai else 5
-                yield Stage1Transfer, dict(
-                    transfer=transfer,
-                    belief_partner_intended_return=round(transfer * C.MULTIPLIER * 0.6) if use_ai else 6,
-                )
-            else:
-                yield Stage1TransferBelief, dict(
-                    belief_partner_transfer=stage1_ai_transfer(self.player) if use_ai else 5
-                )
-                yield Stage1Return, dict(
-                    intended_return=stage1_ai_return(self.player) if use_ai else 7
-                )
-            yield Stage1Results
+            yield Part1RulesIntro
+            yield Part1Instructions
+            yield Part1Quiz, dict(
+                part1_quiz_p1_multiplied=12,
+                part1_quiz_p1_payoff=11,
+                part1_quiz_p2_payoff=7,
+            )
+            yield Part1QuestionsIntro
+            yield Part1ProposerDecision, dict(
+                part1_proposer_offer=part1_bot_offer(self.player),
+            )
+            yield Part1ResponderStrategy, part1_bot_returns(self.player)
+            yield Part1Results
             return
 
         if self.round_number == C.STAGE1_ROUNDS + 1:
-            realized_return_answer = 2 if self.group.noise_treatment == C.NOISE else 4
+            yield Part2RoleAssignment
+            realized_return_answer = -1 if self.group.noise_treatment == C.NOISE else 6
             account_answer = 1 if self.group.treatment == C.REINVESTMENT else 0
             maxsend_answer = (
                 "endowment_plus_account"
@@ -166,6 +153,7 @@ class PlayerBot(Bot):
 
         pair_active = active_in_stage2(self.group)
         if pair_active:
+            yield Stage2RoundIntro
             if self.player.id_in_group == 1:
                 amount_sent = stage2_ai_amount_sent(self.player) if use_ai else 4
                 yield Stage2Transfer, dict(
@@ -185,12 +173,12 @@ class PlayerBot(Bot):
                 player_b = self.group.get_player_by_id(2)
                 yield Stage2Results, dict(
                     belief_partner_return_post=round(min(float(self.player.realized_return), float(player_b.received_amount))),
-                    signal_attribution=stage2_ai_attribution(self.player) if use_ai else 5,
                 )
             else:
                 yield Stage2Results
 
         if self.round_number == C.NUM_ROUNDS:
+            yield SurveyIntro
             survey_form = dict(
                 gender="male",
                 age=25,

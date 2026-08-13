@@ -1,28 +1,29 @@
-{{ block title }}Part 2: round {{ stage2_round }}{{ endblock }}
-
+{{ block title }}{{ endblock }}
 {{ block content }}
-<p>
-    Your Part 2 accumulated account at the start of this round is <strong>{{ account }}</strong>.
-</p>
-<p>
-    In this round, you received <strong>{{ received_amount }}</strong>.
-</p>
-<p>
-    You may choose how many points to return, from 0 to {{ max_return }}.
-</p>
-{{ if has_noise }}
-<p>
-    The computer applies a random adjustment to the amount you return, and
-    player 1 receives the adjusted amount.
-</p>
-{{ else }}
-<p>
-    player 1 receives = return chosen by you
-</p>
-{{ endif }}
-<p>
-    your earnings = amount you received - return chosen by you
-</p>
-{{ formfields }}
-{{ next_button }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell">
+    <div class="response-head">
+        <div class="response-pill">PART 2</div><div class="response-title">Player 2 decision</div><div class="response-count">Round {{ stage2_round }}</div>
+    </div>
+    <div class="response-stage">
+        <div class="response-lines">
+            <div class="response-line">Your role is <strong class="value-orange">Player 2</strong>.</div>
+            <div class="response-line">Your Part 2 accumulated account is <strong class="value-green">{{ account }}</strong>.</div>
+            <div class="response-line response-key-fact blue">Player 1 sent <strong class="value-blue">{{ amount_sent }}</strong> this round.</div>
+            <div class="response-line response-key-fact orange">You received <strong class="value-orange">{{ received_amount }}</strong> this round.</div>
+            <div class="response-line">You can return a whole number from <strong class="value-purple">0 to {{ max_return }}</strong>.</div>
+            {{ if has_noise }}
+                <div class="response-line">The computer may adjust the return before it reaches Player 1.</div>
+                <div class="response-line">The adjustment affects <strong class="value-blue">only Player 1's payoff</strong>, not your payoff or account.</div>
+            {{ endif }}
+            <div class="response-line">Your round payoff is <strong class="value-yellow">the amount received minus the amount returned</strong>.</div>
+        </div>
+    </div>
+    <div class="response-form">
+        <div class="response-form-title">Choose your return</div>
+        <div class="response-form-help">Enter one whole number.</div>
+        <div class="response-field orange">{{ formfield 'intended_return' }}</div>
+        <div class="response-next">{{ next_button }}</div>
+    </div>
+</div>
 {{ endblock }}

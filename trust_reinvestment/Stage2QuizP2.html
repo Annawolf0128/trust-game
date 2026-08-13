@@ -1,27 +1,65 @@
-{{ block title }}Part 2 Quiz{{ endblock }}
-
+{{ block title }}{{ endblock }}
 {{ block content }}
-<p>
-    Please answer these questions before Part 2 begins.
-</p>
-
-{{ formfield 'part2_quiz_p2_account' }}
-
-{{ formfield 'part2_quiz_p2_multiplier' }}
-
-{{ if has_noise }}
-<p>
-    For the next question, suppose you choose to return 4 points to player 1,
-    and the computer adjustment for this round is x0.5.
-</p>
-{{ else }}
-<p>
-    For the next question, suppose you choose to return 4 points to player 1.
-</p>
-{{ endif }}
-{{ formfield 'part2_quiz_p2_realized_return' }}
-
-{{ formfield 'part2_quiz_p2_maxsend' }}
-
-{{ next_button }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell">
+    <div class="response-head">
+        <div class="response-pill">PART 2</div><div class="response-title">Understanding test</div><div class="response-count">Player 2</div>
+    </div>
+    <div class="response-stage compact">
+        <div class="response-lines">
+            <div class="response-line">Your assigned role is <strong class="value-orange">Player 2</strong>.</div>
+            <div class="response-line">These questions check your understanding of the Part 2 rules.</div>
+            <div class="response-line">Your answers to this test <strong class="value-yellow">do not affect your payment</strong>.</div>
+            <div class="response-line">All answers must be correct before you continue.</div>
+        </div>
+    </div>
+    <div class="response-form">
+        {{ if form.errors }}
+        <div class="quiz-error-summary" role="alert" aria-live="assertive">
+            <div class="quiz-error-title">Some answers are incorrect.</div>
+            <div class="quiz-error-copy">Please review the questions marked below and try again.</div>
+        </div>
+        {{ endif }}
+        <div class="quiz-form-heading">
+            <div class="response-form-title">Answer all four questions</div>
+            <button type="button" class="quiz-review-button" data-rule-review-open="part2-p2-rule-review">Review game rules</button>
+        </div>
+        <div class="response-field orange"><div class="quiz-question-number">Question 1</div>{{ formfield 'part2_quiz_p2_account' }}</div>
+        <div class="response-scenario">For the next question, suppose you choose to return <strong>6 points</strong>.</div>
+        <div class="response-field purple"><div class="quiz-question-number">Question 2</div>{{ formfield 'part2_quiz_p2_realized_return' }}</div>
+        <div class="response-field orange"><div class="quiz-question-number">Question 3</div>{{ formfield 'part2_quiz_p2_multiplier' }}</div>
+        <div class="response-field orange"><div class="quiz-question-number">Question 4</div>{{ formfield 'part2_quiz_p2_maxsend' }}</div>
+        <div class="response-next">{{ next_button }}</div>
+    </div>
+    <div class="rules-review-overlay" id="part2-p2-rule-review" data-rule-review-overlay hidden>
+        <div class="rules-review-dialog" role="dialog" aria-modal="true" aria-labelledby="part2-p2-rule-review-title">
+            <div class="rules-review-head">
+                <div id="part2-p2-rule-review-title" class="rules-review-title">Part 2 game rules</div>
+                <button type="button" class="rules-review-close" data-rule-review-close aria-label="Close rule review">×</button>
+            </div>
+            <div class="rules-review-body">
+                <div class="rules-review-item">You remain <strong class="value-orange">Player 2</strong> and remain matched with the same participant throughout Part 2.</div>
+                <div class="rules-review-item">Part 2 lasts for at least 5 rounds. After Round 5, each completed round is followed by an 80% chance of another round and a 20% chance that Part 2 ends.</div>
+                <div class="rules-review-item">At the start of <strong class="value-yellow">every round</strong>, Player 1 receives a 10-point endowment. Player 2 receives no endowment.</div>
+                <div class="rules-review-item">Player 2 receives <strong class="value-yellow">three times</strong> the amount Player 1 sent.</div>
+                <div class="rules-review-item">Each round payoff is added to the accumulated Part 2 account. Your Part 2 payoff equals the final balance in that account.</div>
+                {{ if is_reinvestment }}
+                <div class="rules-review-formula"><strong>Maximum amount Player 1 can send</strong> = 10 + the accumulated-account balance</div>
+                {{ else }}
+                <div class="rules-review-formula"><strong>Maximum amount Player 1 can send</strong> = the current 10-point endowment</div>
+                {{ endif }}
+                {{ if has_noise }}
+                <div class="rules-review-item">The computer changes how many returned points reach Player 1: no returned points with 20% probability, exactly the returned amount with 60% probability, and twice the returned amount with 20% probability.</div>
+                <div class="rules-review-item">This computer adjustment affects only Player 1's payoff. It does not affect Player 2's payoff.</div>
+                {{ else }}
+                <div class="rules-review-item">There is no computer adjustment to the amount Player 2 returns.</div>
+                {{ endif }}
+                <div class="rules-review-formula"><strong>Player 1 round payoff</strong> = points not sent + points that reach Player 1</div>
+                <div class="rules-review-formula orange"><strong>Player 2 round payoff</strong> = points received − points returned</div>
+            </div>
+            <div class="rules-review-actions"><button type="button" class="quiz-review-button primary" data-rule-review-close>Back to the questions</button></div>
+        </div>
+    </div>
+</div>
+<script src="{{ static 'trust_reinvestment/quiz_rule_review.js' }}"></script>
 {{ endblock }}

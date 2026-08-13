@@ -1,12 +1,4 @@
-{{ block title }}Please Wait{{ endblock }}
-
-{{ block content }}
-<p>
-    You have finished all of your decisions and the survey. Please wait while the
-    other participants complete the experiment.
-</p>
-<p>
-    Please stay in your seat and remain quiet. Do not leave or talk to others.
-    Once everyone has finished, you will see your final results and payment.
-</p>
+{{ block title }}{{ endblock }}{{ block content }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell"><div class="response-head"><div class="response-pill">FINAL PART</div><div class="response-title">Survey complete</div><div class="response-count">Please wait</div></div><div class="response-stage waiting"><div><div class="wait-orbit"></div><div class="wait-title">All your answers are recorded</div><div class="wait-copy">Please remain seated and quiet while the other participants finish. Your final results and payment will appear when everyone is ready.</div></div></div></div>
 {{ endblock }}

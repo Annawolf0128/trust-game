@@ -1,28 +1,89 @@
-{{ block title }}Part 2 Results{{ endblock }}
-
+{{ block title }}{{ endblock }}
 {{ block content }}
-{{ if view_as_p1 }}
-<p>You sent <strong>{{ player.transfer }}</strong> from the current endowment.</p>
-{{ if treatment == C.REINVESTMENT }}
-<p>You used <strong>{{ player.reinvestment }}</strong> from your Part 2 accumulated account.</p>
-{{ endif }}
-<p>The amount player 2 received was <strong>{{ received_amount }}</strong>.</p>
-<p>
-    The amount that reached you from player 2 this round was <strong>{{ realized_return }}</strong>.
-</p>
-{{ else }}
-<p>The final amount you received was <strong>{{ player.received_amount }}</strong>.</p>
-<p>
-    You returned <strong>{{ player.intended_return }}</strong> to player 1.
-</p>
-{{ endif }}
-<p>Your payoff this round is <strong>{{ player.round_payoff }}</strong>.</p>
-<p>Your Part 2 accumulated account balance is now <strong>{{ account_balance }}</strong>.</p>
-{{ formfields }}
-{{ if should_continue }}
-<p>The interaction continues to another round.</p>
-{{ else }}
-<p>The interaction has stopped.</p>
-{{ endif }}
-{{ next_button }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell">
+    <div class="response-head">
+        <div class="response-pill">PART 2</div><div class="response-title">Round results</div><div class="response-count">Round {{ stage2_round }}</div>
+    </div>
+    {{ if view_as_p1 }}
+        <div class="response-stage">
+            <div class="response-lines">
+                <div class="response-line">You sent <strong class="value-blue">{{ player.transfer }}</strong> from this round's endowment.</div>
+                {{ if is_reinvestment }}
+                    <div class="response-line">You also used <strong class="value-green">{{ player.reinvestment }}</strong> from your Part 2 accumulated account.</div>
+                {{ endif }}
+                <div class="response-line">Player 2 received <strong class="value-orange">{{ received_amount }}</strong>.</div>
+                <div class="response-line response-highlight">The amount that reached you was <strong class="value-purple">{{ realized_return }}</strong>.</div>
+                <div class="response-line">Your payoff this round is <strong class="value-yellow">{{ player.round_payoff }}</strong>.</div>
+                <div class="response-line">Your Part 2 accumulated account is now <strong class="value-green">{{ account_balance }}</strong>.</div>
+                {{ if should_continue }}
+                    <div class="response-line">The interaction <strong class="value-green">will continue to the next round</strong>.</div>
+                {{ else }}
+                    {{ if pilot_forced_stop }}
+                        <div class="response-line">The game <strong class="value-yellow">has stopped</strong>.</div>
+                    {{ endif }}
+                {{ endif }}
+            </div>
+        </div>
+    {{ else }}
+        <div class="response-stage p2-results-stage">
+            <div class="p2-results-layout">
+                <section class="p2-result-card decisions" aria-labelledby="p2-round-decisions">
+                    <h2 id="p2-round-decisions" class="p2-result-card-title">Round decisions</h2>
+                    <div class="p2-result-row blue">
+                        <span>Player 1 sent</span>
+                        <strong>{{ partner_transfer }}</strong>
+                    </div>
+                    <div class="p2-result-row orange">
+                        <span>You received</span>
+                        <strong>{{ player.received_amount }}</strong>
+                    </div>
+                    <div class="p2-result-row purple">
+                        <span>You returned</span>
+                        <strong>{{ player.intended_return }}</strong>
+                    </div>
+                </section>
+
+                <section class="p2-result-card earnings" aria-labelledby="p2-round-earnings">
+                    <h2 id="p2-round-earnings" class="p2-result-card-title">Your earnings</h2>
+                    <div class="p2-result-metric payoff">
+                        <span>Round payoff</span>
+                        <strong>{{ player.round_payoff }}</strong>
+                    </div>
+                    <div class="p2-result-metric account">
+                        <span>Part 2 accumulated account</span>
+                        <strong>{{ account_balance }}</strong>
+                    </div>
+                </section>
+
+                {{ if should_continue }}
+                    <section class="p2-result-next" aria-label="Next-round status">
+                        <span>Next round</span>
+                        <strong>The interaction will continue.</strong>
+                    </section>
+                {{ else }}
+                    {{ if pilot_forced_stop }}
+                        <section class="p2-result-next stopped" aria-label="Game status">
+                            <span>Game status</span>
+                            <strong>The game has stopped.</strong>
+                        </section>
+                    {{ endif }}
+                {{ endif }}
+            </div>
+        </div>
+    {{ endif }}
+    {{ if view_as_p1 }}
+        {{ if has_noise }}
+            <div class="response-form">
+                <div class="response-form-title">Answer one question about this result</div>
+                <div class="response-field purple">{{ formfield 'belief_partner_return_post' }}</div>
+                <div class="response-next">{{ next_button }}</div>
+            </div>
+        {{ else }}
+            <div class="response-form"><div class="response-next">{{ next_button }}</div></div>
+        {{ endif }}
+    {{ else }}
+        <div class="response-form"><div class="response-next">{{ next_button }}</div></div>
+    {{ endif }}
+</div>
 {{ endblock }}

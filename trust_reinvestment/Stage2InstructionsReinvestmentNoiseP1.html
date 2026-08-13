@@ -15,10 +15,11 @@
     player 2 returns before it reaches you:
 </p>
 <ul>
-    <li>80% chance: amount that reaches you = amount player 2 returns</li>
-    <li>10% chance: amount that reaches you = amount player 2 returns x 0.5</li>
-    <li>10% chance: amount that reaches you = amount player 2 returns x 1.5</li>
+    <li>60% chance: amount that reaches you = amount player 2 returns</li>
+    <li>20% chance: amount that reaches you = amount player 2 returns x 0</li>
+    <li>20% chance: amount that reaches you = amount player 2 returns x 2</li>
 </ul>
+<p><strong>The computer adjustment affects only your earnings. It does not change player 2's earnings.</strong></p>
 <p>your earnings = points kept from the current-round endowment + amount that reaches you from player 2</p>
 <p>player 2 earnings = amount player 2 receives - points player 2 returns</p>
 <p>
@@ -27,7 +28,7 @@
     subtracted from it.
 </p>
 <p>
-    You see only the final amount that reaches you after the computer
+    You see only the amount that reaches you after the computer
     adjustment, not the amount player 2 chose to return.
 </p>
 <p>
@@ -36,5 +37,6 @@
     chance that Part 2 ends and an {{ continue_probability }}% chance that your
     pair continues for one more round.
 </p>
+<p>After the round is completed, you and player 2 will be informed whether Part 2 will continue.</p>
 {{ next_button }}
 {{ endblock }}

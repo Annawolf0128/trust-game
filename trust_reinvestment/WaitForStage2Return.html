@@ -1,10 +1,4 @@
-{{ block title }}Please Wait{{ endblock }}
-
-{{ block content }}
-{{ if player.id_in_group == 1 }}
-<p>The final amount player 2 received this round is <strong>{{ received_amount }}</strong>.</p>
-<p>Waiting for player 2's decision.</p>
-{{ else }}
-<p>Waiting for the other player in your pair.</p>
-{{ endif }}
+{{ block title }}{{ endblock }}{{ block content }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell"><div class="response-head"><div class="response-pill">PART 2</div><div class="response-title">Round in progress</div><div class="response-count">Please wait</div></div><div class="response-stage waiting"><div><div class="wait-orbit"></div>{{ if player.id_in_group == 1 }}<div class="wait-title">Waiting for Player 2</div><div class="wait-copy">Player 2 received <strong class="wait-value">{{ received_amount }}</strong> this round and is now making a return decision.</div>{{ else }}<div class="wait-title">Calculating the result</div><div class="wait-copy">Please wait while the other player in your pair finishes this step.</div>{{ endif }}</div></div></div>
 {{ endblock }}

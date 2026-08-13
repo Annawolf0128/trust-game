@@ -1,0 +1,37 @@
+{{ block title }}{{ endblock }}
+
+{{ block content }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<style>
+    .round-intro-stage{min-height:calc(100vh - 76px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:42px 24px 120px;background:#232a33}
+    .round-intro-kicker{font-size:28px;font-weight:900;color:#cbd4db;margin-bottom:18px}
+    .round-intro-number{font-size:clamp(72px,10vw,145px);line-height:1;font-weight:950;color:#ffd166;letter-spacing:-.04em;animation:roundIn .55s ease both}
+    .round-intro-copy{font-size:25px;font-weight:850;color:#f7f9fb;margin-top:28px}
+    .round-intro-actions{position:fixed;right:38px;bottom:30px;z-index:3}
+    .round-start{min-width:250px;border-radius:16px;padding:17px 28px;border:3px solid #74b9f5;background:#74b9f5;color:#102131;font-size:23px;font-weight:950}
+    .otree-btn-next{display:none!important}
+    @keyframes roundIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+</style>
+
+<div class="response-shell">
+    <header class="response-head">
+        <span class="response-pill">PART 2</span>
+        <span class="response-title">{{ if is_first_stage2_round }}Part 2 begins{{ else }}The next round{{ endif }}</span>
+        <span class="response-count">Round {{ stage2_round }}</span>
+    </header>
+    <main class="round-intro-stage">
+        <div class="round-intro-kicker">{{ if is_first_stage2_round }}The game now officially begins{{ else }}Get ready for the next round{{ endif }}</div>
+        <div class="round-intro-number">Round {{ stage2_round }}</div>
+        <div class="round-intro-copy">Click the button when you are ready.</div>
+    </main>
+    <div class="round-intro-actions">
+        <button type="button" class="round-start" id="round-start">Start Round {{ stage2_round }}</button>
+    </div>
+</div>
+{{ next_button }}
+<script>
+document.getElementById('round-start').addEventListener('click', function(){
+    document.querySelector('.otree-btn-next').click();
+});
+</script>
+{{ endblock }}

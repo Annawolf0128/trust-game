@@ -1,23 +1,26 @@
-{{ block title }}Part 2: round {{ stage2_round }}{{ endblock }}
-
+{{ block title }}{{ endblock }}
 {{ block content }}
-<p>
-    Your Part 2 accumulated account at the start of this round is <strong>{{ account }}</strong>.
-</p>
-{{ if is_reinvestment }}
-<p>
-    Player 1 may send up to {{ max_send }} to you this round (a
-    current-period endowment of {{ endowment }} plus their accumulated account).
-</p>
-{{ else }}
-<p>
-    Player 1 may send up to {{ max_send }} to you this round (their
-    current-period endowment).
-</p>
-{{ endif }}
-<p>
-    Before you learn player 1's decision, please tell us what you expect.
-</p>
-{{ formfields }}
-{{ next_button }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell">
+    <div class="response-head">
+        <div class="response-pill">PART 2</div><div class="response-title">Player 2 belief</div><div class="response-count">Round {{ stage2_round }}</div>
+    </div>
+    <div class="response-stage">
+        <div class="response-lines">
+            <div class="response-line">Your role is <strong class="value-orange">Player 2</strong>.</div>
+            <div class="response-line">Your Part 2 accumulated account is <strong class="value-green">{{ account }}</strong>.</div>
+            {{ if is_reinvestment }}
+                <div class="response-line">Player 1 can send up to <strong class="value-blue">{{ max_send }}</strong> using this round's endowment and accumulated account.</div>
+            {{ else }}
+                <div class="response-line">Player 1 can send up to <strong class="value-blue">{{ max_send }}</strong> from this round's endowment.</div>
+            {{ endif }}
+        </div>
+    </div>
+    <div class="response-form">
+        <div class="response-form-title">Report your belief</div>
+        <div class="response-form-help">Enter one whole number.</div>
+        <div class="response-field purple">{{ formfield 'belief_partner_transfer' }}</div>
+        <div class="response-next">{{ next_button }}</div>
+    </div>
+</div>
 {{ endblock }}

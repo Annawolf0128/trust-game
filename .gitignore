@@ -6,6 +6,11 @@ db.sqlite3
 *.otreezip
 _static/*
 !_static/.gitkeep
+!_static/trust_reinvestment/
+!_static/trust_reinvestment/**
+_static/trust_reinvestment/part1-rules-221s.mp4
+_static/trust_reinvestment/.DS_Store
+tmp/
 .Rhistory
 participant_text_review.html
 participant_text_review.md

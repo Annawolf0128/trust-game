@@ -1,5 +1,42 @@
 # Trust as Reinvestable Social Capital — oTree Experiment
 
+## Quick start after downloading
+
+Open a fresh Terminal tab before entering the commands below. If the current
+Terminal is already running another local server and does not show a normal
+prompt such as `rabbit@... %`, press **Control+C** to stop that process, or press
+**Command+T** to open a new Terminal tab. GitHub CLI login (`gh auth login`) is
+not required to run this experiment.
+
+First enter `cd ` with a trailing space, drag the downloaded repository folder
+from the Desktop into the Terminal window, and press Return. Alternatively, if
+the downloaded folder is named `trust-game-main`, run:
+
+```bash
+cd /Users/rabbit/Desktop/trust-game-main
+```
+
+For the first run, execute these commands one at a time:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+otree devserver
+```
+
+When the server starts, open <http://localhost:8000>. The default local admin
+credentials are `admin` / `admin`. Stop the server with **Control+C**.
+
+For later runs from the same downloaded folder, only the following commands
+are needed:
+
+```bash
+source .venv/bin/activate
+otree devserver
+```
+
 This repository contains the current oTree implementation of a two-part trust
 game studying whether trust persists, collapses after adverse outcomes, and is
 shaped by payoff noise and opportunities to reuse accumulated earnings.

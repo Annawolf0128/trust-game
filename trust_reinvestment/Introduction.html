@@ -1,21 +1,16 @@
-{{ block title }}Decision Task{{ endblock }}
-
+{{ block title }}{{ endblock }}
 {{ block content }}
-<p>
-    You will be randomly matched with another player. You will also be
-    randomly assigned a role: player 1 or player 2. Your matched player and
-    your role will remain the same throughout the experiment.
-</p>
-<p>
-    The experiment has two parts and a short final questionnaire.
-</p>
-<p>
-    Your earnings from Part 1 and Part 2 will be kept in two separate
-    accumulated accounts: a Part 1 account and a Part 2 account. These accounts
-    are tracked separately during the experiment. At the end, you will answer a
-    short questionnaire. Your final payment is based on the total number of
-    points in the two accounts combined. For this session, each point is worth
-    {{ payment_rate }}.
-</p>
-{{ next_button }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell">
+    <div class="response-head"><div class="response-pill">WELCOME</div><div class="response-title">Payment overview</div><div class="response-count">Before Part 1</div></div>
+    <div class="response-stage results">
+        <div class="response-lines">
+            <div class="response-line">Your final experiment payment combines your earnings from <strong class="value-blue">Part 1</strong> and <strong class="value-orange">Part 2</strong>.</div>
+            <div class="response-line">Every point earned in either part is worth <strong class="value-yellow">{{ part1_rate }}</strong>.</div>
+            <div class="response-line">You will also receive a fixed <strong class="value-green">{{ show_up_fee }}</strong> show-up fee.</div>
+            <div class="response-line">The two accounts remain separate during the experiment and are converted at the end.</div>
+        </div>
+    </div>
+    <div class="response-actions">{{ next_button }}</div>
+</div>
 {{ endblock }}

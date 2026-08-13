@@ -1,8 +1,71 @@
-{{ block title }}Final Results{{ endblock }}
-
+{{ block title }}{{ endblock }}
 {{ block content }}
-<p>Your Part 1 accumulated account balance is <strong>{{ part1_account }}</strong>.</p>
-<p>Your Part 2 accumulated account balance is <strong>{{ part2_account }}</strong>.</p>
-<p>Your final accumulated account balance is <strong>{{ total_payoff }}</strong>.</p>
-<p>Thank you for participating.</p>
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<style>
+    .optional-reading {
+        margin: 0 42px 28px;
+        padding: 18px 24px;
+        border: 3px solid #61cf93;
+        border-radius: 20px;
+        background: #2b363e;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+    }
+    .optional-reading-copy {
+        color: #f7f9fb;
+        font-size: 20px;
+        font-weight: 800;
+        line-height: 1.35;
+    }
+    .optional-reading-note {
+        margin-top: 4px;
+        color: #cbd4db;
+        font-size: 15px;
+        font-weight: 650;
+    }
+    .optional-reading-link {
+        flex: 0 0 auto;
+        padding: 14px 22px;
+        border-radius: 14px;
+        background: #61cf93;
+        color: #10202a;
+        font-size: 18px;
+        font-weight: 900;
+        text-decoration: none;
+    }
+    .optional-reading-link:hover,
+    .optional-reading-link:focus {
+        background: #82dda9;
+        color: #10202a;
+        text-decoration: none;
+    }
+    @media (max-width: 760px) {
+        .optional-reading {
+            margin: 0 18px 22px;
+            align-items: stretch;
+            flex-direction: column;
+        }
+        .optional-reading-link {
+            text-align: center;
+        }
+    }
+</style>
+<div class="response-shell">
+    <div class="response-head"><div class="response-pill">COMPLETE</div><div class="response-title">Game Complete</div><div class="response-count">Thank you</div></div>
+    <div class="response-stage tall"><div style="width:100%">
+        <div class="payment-grid"><div class="payment-part"><span>Part 1 payoff</span><strong>{{ part1_account }}</strong><span>{{ part1_payment_usd }}</span></div><div class="payment-plus">+</div><div class="payment-part orange"><span>Part 2 payoff</span><strong>{{ part2_account }}</strong><span>{{ part2_payment_usd }}</span></div></div>
+        <div class="payment-total">Decision earnings: {{ decision_payment_usd }} &nbsp; + &nbsp; Show-up fee: {{ show_up_fee_usd }}</div>
+        <div class="payment-total">Total payment: {{ final_payment_usd }}</div>
+    </div></div>
+    <div class="response-stage compact"><div class="response-lines"><div class="response-line">You have completed the experiment. Thank you for your participation.</div><div class="response-line">Please remain seated and do not leave yet.</div><div class="response-line">Wait quietly until the other participants have finished.</div><div class="response-line">The experimenter will tell you when to leave.</div></div></div>
+    <div class="optional-reading">
+        <div>
+            <div class="optional-reading-copy">If you are bored while you wait, you can read <em>Anna Karenina</em>.</div>
+            <div class="optional-reading-note">This is optional and does not affect your payment.</div>
+        </div>
+        <a class="optional-reading-link" href="{{ static 'trust_reinvestment/readings/anna_karenina_optional_reading.pdf' }}" target="_blank" rel="noopener">Read <em>Anna Karenina</em></a>
+    </div>
+</div>
 {{ endblock }}

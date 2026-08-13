@@ -1,0 +1,14 @@
+{{ block title }}{{ endblock }}
+{{ block content }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell">
+    <div class="response-head"><div class="response-pill">PART 1</div><div class="response-title">Question 1: You as Player 1</div><div class="response-count">Question 1 of 2</div></div>
+    <div class="response-stage compact"><div class="response-lines"><div class="response-line">Suppose you are <strong class="value-blue">Player 1</strong>.</div><div class="response-line">How many points will you send to Player 2?</div></div></div>
+    <div class="response-form part1-choice">
+        <div class="response-form-title">Click one button to choose</div>
+        <div class="response-field blue">{{ formfield 'part1_proposer_offer' }}</div>
+        <div class="response-next">{{ next_button }}</div>
+    </div>
+</div>
+<script>history.pushState(null,'',location.href);window.addEventListener('popstate',()=>history.go(1));</script>
+{{ endblock }}

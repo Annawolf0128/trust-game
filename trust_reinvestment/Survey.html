@@ -1,17 +1,32 @@
-{{ block title }}Final Survey{{ endblock }}
-
+{{ block title }}{{ endblock }}
 {{ block content }}
-<p>
-    Please answer a few final questions. Your answers are confidential and do
-    not affect your payment.
-</p>
-
-{{ formfield 'gender' }}
-{{ formfield 'age' }}
-
-{{ formfield 'risk_preference' }}
-{{ formfield 'trust_most_people' }}
-{{ formfield 'trust_willingness' }}
-
-{{ next_button }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<style>
+    .survey-form input[type="radio"]{
+        width:22px!important;height:22px!important;min-width:22px!important;min-height:22px!important;
+        max-width:22px!important;max-height:22px!important;aspect-ratio:1/1!important;
+        padding:0!important;border-radius:50%!important;flex:0 0 22px!important;
+    }
+</style>
+<div class="response-shell">
+    <div class="response-head">
+        <div class="response-pill">FINAL PART</div><div class="response-title">Survey</div><div class="response-count">Almost finished</div>
+    </div>
+    <div class="response-stage compact">
+        <div class="response-lines">
+            <div class="response-line">The final part is a short <strong class="value-blue">survey</strong>.</div>
+            <div class="response-line">Your answers are <strong class="value-green">confidential</strong>.</div>
+            <div class="response-line">Your survey answers <strong class="value-yellow">do not affect your payment</strong>.</div>
+        </div>
+    </div>
+    <div class="response-form survey-form">
+        <div class="response-form-title">Final survey</div>
+        <div class="response-field blue">{{ formfield 'gender' }}</div>
+        <div class="response-field blue">{{ formfield 'age' }}</div>
+        <div class="response-field purple">{{ formfield 'risk_preference' }}</div>
+        <div class="response-field green">{{ formfield 'trust_most_people' }}</div>
+        <div class="response-field green">{{ formfield 'trust_willingness' }}</div>
+        <div class="response-next">{{ next_button }}</div>
+    </div>
+</div>
 {{ endblock }}

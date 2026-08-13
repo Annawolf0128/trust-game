@@ -3,12 +3,12 @@
 {{ block content }}
 <p>Your pair remains the same. The same rules apply in every Part 2 round.</p>
 <p>
-    In each round, you receive a {{ C.ENDOWMENT }} endowment. You may send
+    In each round, you receive an endowment of {{ C.ENDOWMENT }}. You may send
     points to player 2 from this endowment and from your Part 2 accumulated
     account.
 </p>
 <p>amount you send = points from the current-round endowment + points from your Part 2 accumulated account</p>
-<p>Player 2 receives <strong>three times</strong> the amount you send.</p>
+<p>Player 2 receives <strong>{{ C.MULTIPLIER }} times</strong> the amount you send.</p>
 <p>
     You and player 2 will see the amount player 2 receives. Player 2 then
     chooses how many points to return to you.
@@ -23,8 +23,9 @@
 <p>
     Part 2 lasts for at least {{ min_rounds }} rounds. After round
     {{ min_rounds }}, at the end of each round there is a {{ stopping_probability }}%
-    chance that Part 2 ends and a {{ continue_probability }}% chance that your
+    chance that Part 2 ends and an {{ continue_probability }}% chance that your
     pair continues for one more round.
 </p>
+<p>After the round is completed, you and player 2 will be informed whether Part 2 will continue.</p>
 {{ next_button }}
 {{ endblock }}

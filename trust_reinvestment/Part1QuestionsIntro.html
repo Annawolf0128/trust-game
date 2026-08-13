@@ -1,0 +1,9 @@
+{{ block title }}{{ endblock }}
+{{ block content }}
+<link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<div class="response-shell">
+    <div class="response-head"><div class="response-pill">PART 1</div><div class="response-title">Decisions in Part 1</div><div class="response-count">Payoff-relevant</div></div>
+    <div class="response-stage waiting"><div><div class="wait-title value-yellow">Decisions in Part 1</div><div class="wait-copy">Your answers to the next two questions can determine your Part 1 payoff.</div></div></div>
+    <div class="response-actions">{{ next_button }}</div>
+</div>
+{{ endblock }}

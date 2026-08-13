@@ -7,7 +7,7 @@
     may send points from a current-round endowment of {{ C.ENDOWMENT }} and from
     player 1's Part 2 accumulated account.
 </p>
-<p>You receive <strong>three times</strong> the total amount player 1 sends.</p>
+<p>You receive <strong>{{ C.MULTIPLIER }} times</strong> the total amount player 1 sends.</p>
 <p>
     You and player 1 will see the amount you receive. You then choose how many
     points to return to player 1.
@@ -21,8 +21,9 @@
 <p>
     Part 2 lasts for at least {{ min_rounds }} rounds. After round
     {{ min_rounds }}, at the end of each round there is a {{ stopping_probability }}%
-    chance that Part 2 ends and a {{ continue_probability }}% chance that your
+    chance that Part 2 ends and an {{ continue_probability }}% chance that your
     pair continues for one more round.
 </p>
+<p>After the round is completed, you and player 1 will be informed whether Part 2 will continue.</p>
 {{ next_button }}
 {{ endblock }}

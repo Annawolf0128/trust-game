@@ -41,8 +41,6 @@
      data-noise="{{ has_noise }}"
      data-role="{{ role_number }}"
      data-min-rounds="{{ min_rounds }}"
-     data-stop="{{ stopping_probability }}"
-     data-continue="{{ continue_probability }}"
      data-p1-rate="{{ part1_rate }}"
      data-p2-rate="{{ part2_rate }}">
     <div class="p2-head">
@@ -69,8 +67,6 @@
     const noise=shell.dataset.noise.toLowerCase()==='true';
     const role=Number(shell.dataset.role||1);
     const minRounds=shell.dataset.minRounds;
-    const stop=shell.dataset.stop;
-    const cont=shell.dataset.continue;
     const p1Rate=shell.dataset.p1Rate;
     const p2Rate=shell.dataset.p2Rate;
 
@@ -83,7 +79,7 @@
     function people(link=false){return `<div class="people">${person(1,role===1)}${link?'<div class="fixed-link"></div>':''}${person(2,role===2)}</div>`}
     const scenes=[];
     scenes.push({title:'Your role and matched participant',visual:people(true),text:['There are still two roles in this game: Player 1 and Player 2.',`You remain Player ${role}.`,'You remain matched with the same participant.']});
-    scenes.push({title:'How long Part 2 lasts',visual:`<div class="rounds"><div class="round-row">${[1,2,3,4,5].map(n=>`<div class="round-dot">${n}</div>`).join('')}</div><div class="chance-row"><div class="chance go">${cont}%<br>continue</div><div class="chance stop">${stop}%<br>end</div></div></div>`,text:[`Part 2 lasts for at least ${minRounds} rounds.`,`After each round from Round ${minRounds} onward, the game continues with an ${cont}% probability and ends with a ${stop}% probability.`]});
+    scenes.push({title:'How long Part 2 lasts',visual:`<div class="rounds"><div class="round-row">${[1,2,3,4].map(n=>`<div class="round-dot">${n}</div>`).join('')}<div class="round-dot">?</div></div></div>`,text:[`Part 2 lasts for at least ${minRounds} rounds.`,'The total number of rounds is determined by the computer and will not be announced in advance.']});
     scenes.push({title:'Your accumulated Part 2 account',visual:`<div class="mechanic">${pile('green','previous balance','split-left')}<div class="operator">+</div>${pile('yellow','round earnings','split-right')}<div class="operator">=</div><div class="account drop-account"><div class="account-title">PART 2 ACCOUNT</div><div class="account-balance">new balance</div></div></div>`,text:['Your earnings from every round are added to your accumulated Part 2 account.','Your Part 2 payoff is equal to the final balance in your accumulated Part 2 account.','Your Part 1 payoff is recorded separately and is not included in your accumulated Part 2 account.']});
     scenes.push({title:'An endowment each round',visual:`<div class="mechanic endowment-mechanic"><div class="endowment-p1-group">${person(1)}${tenPile('blue','10-point endowment','grow')}</div>${person(2)}</div>`,text:['At the start of <span class="value-blue">every round</span>, Player 1 receives a 10-point endowment.','Player 2 receives no endowment.']});
     if(reinvest){

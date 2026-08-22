@@ -2,8 +2,8 @@ from os import environ
 
 SESSION_CONFIG_DEFAULTS = dict(
     # Parts 1 and 2 use the same exchange rate.
-    real_world_currency_per_point=0.50,
-    participation_fee=5.00,
+    real_world_currency_per_point=0.10,
+    participation_fee=10.00,
     doc="Two-person allocation task",
 )
 
@@ -89,7 +89,7 @@ SESSION_CONFIGS = [
 ]
 
 LANGUAGE_CODE = "en"
-REAL_WORLD_CURRENCY_CODE = "USD"
+REAL_WORLD_CURRENCY_CODE = "CNY"
 USE_POINTS = True
 
 ROOMS = [

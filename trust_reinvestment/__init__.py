@@ -16,17 +16,16 @@ class C(BaseConstants):
     # proposer transfer and a complete responder return schedule before one
     # random role/match is used to determine Part 1 earnings.
     STAGE1_ROUNDS = 1
-    STAGE2_MIN_ROUNDS = 5
-    # Hard ceiling on Stage 2 length. With a 20% per-round stopping probability
-    # after the minimum, a pair reaches round 24 with probability ~0.80**19 < 1.5%,
-    # so this cap almost never binds and barely truncates the random-stopping
-    # (geometric) distribution.
-    STAGE2_MAX_ROUNDS = 24
+    STAGE2_MIN_ROUNDS = 4
+    # Part 2 length is drawn ONCE per session (uniform 4..7) before Part 2
+    # starts and applies to every pair in the session. Participants are told
+    # only that the computer decides the number of rounds; they never learn
+    # the draw in advance.
+    STAGE2_MAX_ROUNDS = 7
     NUM_ROUNDS = STAGE1_ROUNDS + STAGE2_MAX_ROUNDS
 
     ENDOWMENT = cu(10)
     MULTIPLIER = 3
-    STOPPING_PROBABILITY = 0.20
 
     NO_REINVESTMENT = "no_reinvestment"
     REINVESTMENT = "reinvestment"
@@ -48,8 +47,8 @@ class C(BaseConstants):
     NOISE_WEIGHTS = [0.2, 0.6, 0.2]
 
     # Both parts use the same exchange rate.
-    PART1_USD_PER_POINT = 0.50
-    PART2_USD_PER_POINT = 0.50
+    PART1_USD_PER_POINT = 0.10
+    PART2_USD_PER_POINT = 0.10
 
 
 class Subsession(BaseSubsession):
@@ -350,6 +349,15 @@ def creating_session(subsession: Subsession):
         # strategies. The payoff match and role are randomized only after all
         # decisions arrive at Part1DecisionWait.
         subsession.group_randomly()
+        # Draw the session-wide Part 2 length once, before anyone plays.
+        # fixed_stage2_rounds (pilot/test configs) overrides the random draw.
+        if "stage2_total_rounds" not in subsession.session.vars:
+            fixed = subsession.session.config.get("fixed_stage2_rounds")
+            subsession.session.vars["stage2_total_rounds"] = (
+                int(fixed)
+                if fixed is not None
+                else random.randint(C.STAGE2_MIN_ROUNDS, C.STAGE2_MAX_ROUNDS)
+            )
         for player in subsession.get_players():
             player.participant.vars["part1_account"] = 0
             player.participant.vars["part2_account"] = 0
@@ -696,13 +704,8 @@ def set_stage2_payoffs(group: Group):
     )
 
     round_in_stage2 = stage2_round_number(player_a)
-    fixed_stage2_rounds = group.session.config.get("fixed_stage2_rounds")
-    if fixed_stage2_rounds is not None:
-        group.stage2_should_continue = round_in_stage2 < int(fixed_stage2_rounds)
-    elif round_in_stage2 < C.STAGE2_MIN_ROUNDS:
-        group.stage2_should_continue = True
-    else:
-        group.stage2_should_continue = random.random() >= C.STOPPING_PROBABILITY
+    total_rounds = int(group.session.vars["stage2_total_rounds"])
+    group.stage2_should_continue = round_in_stage2 < total_rounds
 
 
 class Introduction(Page):
@@ -712,14 +715,11 @@ class Introduction(Page):
 
     @staticmethod
     def vars_for_template(player: Player):
-        stopping_probability_percent = int(C.STOPPING_PROBABILITY * 100)
-        show_up_fee = float(player.session.config.get("participation_fee", 5.00))
+        show_up_fee = float(player.session.config.get("participation_fee", 10.00))
         return dict(
-            stopping_probability_percent=stopping_probability_percent,
-            continue_probability_percent=100 - stopping_probability_percent,
-            part1_rate=f"${C.PART1_USD_PER_POINT:.2f}",
-            part2_rate=f"${C.PART2_USD_PER_POINT:.2f}",
-            show_up_fee=f"${show_up_fee:.2f}",
+            part1_rate=f"¥{C.PART1_USD_PER_POINT:.2f}",
+            part2_rate=f"¥{C.PART2_USD_PER_POINT:.2f}",
+            show_up_fee=f"¥{show_up_fee:.2f}",
         )
 
 
@@ -858,7 +858,6 @@ class Part2RoleAssignment(Page):
 
 
 def stage2_instructions_vars(player: Player):
-    stopping_probability = int(C.STOPPING_PROBABILITY * 100)
     return dict(
         treatment=player.group.treatment,
         noise_treatment=player.group.noise_treatment,
@@ -866,11 +865,9 @@ def stage2_instructions_vars(player: Player):
         is_reinvestment=uses_account_in_part2(player),
         has_noise=has_noise_in_part2(player),
         min_rounds=C.STAGE2_MIN_ROUNDS,
-        stopping_probability=stopping_probability,
-        continue_probability=100 - stopping_probability,
         role_number=player.id_in_group,
-        part1_rate=f"${C.PART1_USD_PER_POINT:.2f}",
-        part2_rate=f"${C.PART2_USD_PER_POINT:.2f}",
+        part1_rate=f"¥{C.PART1_USD_PER_POINT:.2f}",
+        part2_rate=f"¥{C.PART2_USD_PER_POINT:.2f}",
     )
 
 
@@ -1284,18 +1281,18 @@ class FinalResults(Page):
         part1_payment = float(part1_account) * C.PART1_USD_PER_POINT
         part2_payment = float(part2_account) * C.PART2_USD_PER_POINT
         decision_payment = part1_payment + part2_payment
-        show_up_fee = float(player.session.config.get("participation_fee", 5.00))
+        show_up_fee = float(player.session.config.get("participation_fee", 10.00))
         return dict(
             part1_account=part1_account,
             part2_account=part2_account,
             total_payoff=total_payoff,
-            part1_rate=f"${C.PART1_USD_PER_POINT:.2f}",
-            part2_rate=f"${C.PART2_USD_PER_POINT:.2f}",
-            part1_payment_usd=f"${part1_payment:.2f}",
-            part2_payment_usd=f"${part2_payment:.2f}",
-            decision_payment_usd=f"${decision_payment:.2f}",
-            show_up_fee_usd=f"${show_up_fee:.2f}",
-            final_payment_usd=f"${decision_payment + show_up_fee:.2f}",
+            part1_rate=f"¥{C.PART1_USD_PER_POINT:.2f}",
+            part2_rate=f"¥{C.PART2_USD_PER_POINT:.2f}",
+            part1_payment_usd=f"¥{part1_payment:.2f}",
+            part2_payment_usd=f"¥{part2_payment:.2f}",
+            decision_payment_usd=f"¥{decision_payment:.2f}",
+            show_up_fee_usd=f"¥{show_up_fee:.2f}",
+            final_payment_usd=f"¥{decision_payment + show_up_fee:.2f}",
         )
 
 

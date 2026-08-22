@@ -65,11 +65,11 @@ class Introduction(Page):
 
     @staticmethod
     def vars_for_template(player: Player):
-        show_up_fee = float(player.session.config.get("participation_fee", 5.00))
+        show_up_fee = float(player.session.config.get("participation_fee", 10.00))
         return dict(
-            part1_rate="$0.50",
-            part2_rate="$0.50",
-            show_up_fee=f"${show_up_fee:.2f}",
+            part1_rate="¥0.10",
+            part2_rate="¥0.10",
+            show_up_fee=f"¥{show_up_fee:.2f}",
         )
 
 

@@ -23,8 +23,7 @@ class C(BaseConstants):
     # Mirrors trust_reinvestment so the shared templates render the same numbers.
     ENDOWMENT = cu(10)
     MULTIPLIER = 3
-    STAGE2_MIN_ROUNDS = 5
-    STOPPING_PROBABILITY = 0.20
+    STAGE2_MIN_ROUNDS = 4
 
     NO_REINVESTMENT = "no_reinvestment"
     REINVESTMENT = "reinvestment"
@@ -207,21 +206,18 @@ def part2_quiz_p2_realized_return_choices(player: Player):
 
 
 def _instruction_vars(player: Player):
-    stopping_probability = int(C.STOPPING_PROBABILITY * 100)
     treatment = player.session.config.get("preview_treatment", C.NO_REINVESTMENT)
     noise_treatment = player.session.config.get("preview_noise", "no_noise")
     return dict(
         min_rounds=C.STAGE2_MIN_ROUNDS,
-        stopping_probability=stopping_probability,
-        continue_probability=100 - stopping_probability,
         treatment=treatment,
         noise_treatment=noise_treatment,
         treatment_cell=f"{treatment}_{noise_treatment}",
         is_reinvestment=treatment == C.REINVESTMENT,
         has_noise=noise_treatment == "noise",
         role_number=int(player.session.config.get("preview_role", 1)),
-        part1_rate="$0.50",
-        part2_rate="$0.50",
+        part1_rate="¥0.10",
+        part2_rate="¥0.10",
     )
 
 
@@ -866,19 +862,19 @@ class FinalResults(Page):
     def vars_for_template(player: Player):
         part1_account = cu(player.participant.vars.get("part1_account", 0))
         part2_account = cu(player.participant.vars.get("part2_account", 0))
-        part1_payment = float(part1_account) * 0.50
-        part2_payment = float(part2_account) * 0.50
+        part1_payment = float(part1_account) * 0.10
+        part2_payment = float(part2_account) * 0.10
         decision_payment = part1_payment + part2_payment
-        show_up_fee = float(player.session.config.get("participation_fee", 5.00))
+        show_up_fee = float(player.session.config.get("participation_fee", 10.00))
         return dict(
             part1_account=part1_account,
             part2_account=part2_account,
             total_payoff=part1_account + part2_account,
-            part1_payment_usd=f"${part1_payment:.2f}",
-            part2_payment_usd=f"${part2_payment:.2f}",
-            decision_payment_usd=f"${decision_payment:.2f}",
-            show_up_fee_usd=f"${show_up_fee:.2f}",
-            final_payment_usd=f"${decision_payment + show_up_fee:.2f}",
+            part1_payment_usd=f"¥{part1_payment:.2f}",
+            part2_payment_usd=f"¥{part2_payment:.2f}",
+            decision_payment_usd=f"¥{decision_payment:.2f}",
+            show_up_fee_usd=f"¥{show_up_fee:.2f}",
+            final_payment_usd=f"¥{decision_payment + show_up_fee:.2f}",
         )
 
 

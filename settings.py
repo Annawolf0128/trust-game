@@ -25,8 +25,9 @@ SESSION_CONFIGS = [
         display_name="PILOT — 8 participants, one pair per block",
         num_demo_participants=8,
         app_sequence=["trust_reinvestment"],
-        # Keep the participant-facing random-stopping instructions unchanged,
-        # but make this compact pilot finish after its fifth Part 2 round.
+        # Override the session-level 4-7 round draw: this compact pilot always
+        # ends after its fifth Part 2 round (instructions stay truthful: they
+        # only say the computer decides the number of rounds).
         fixed_stage2_rounds=5,
     ),
     dict(
@@ -96,6 +97,8 @@ ROOMS = [
     dict(
         name="decision_lab",
         display_name="Decision Lab",
+        # Drop-in room: no participant_label_file. Identity is collected on the
+        # first experiment page instead and written to participant.label.
     )
 ]
 

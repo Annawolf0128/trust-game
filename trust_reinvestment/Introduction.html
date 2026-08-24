@@ -5,12 +5,18 @@
     <div class="response-head"><div class="response-pill">WELCOME</div><div class="response-title">Payment overview</div><div class="response-count">Before Part 1</div></div>
     <div class="response-stage results">
         <div class="response-lines">
+            <div class="response-line">This experiment has <strong class="value-yellow">two parts</strong>. You will complete <strong class="value-blue">Part 1</strong> first and then <strong class="value-orange">Part 2</strong>.</div>
             <div class="response-line">Your final experiment payment combines your earnings from <strong class="value-blue">Part 1</strong> and <strong class="value-orange">Part 2</strong>.</div>
             <div class="response-line">Every point earned in either part is worth <strong class="value-yellow">{{ part1_rate }}</strong>.</div>
             <div class="response-line">You will also receive a fixed <strong class="value-green">{{ show_up_fee }}</strong> show-up fee.</div>
             <div class="response-line">The two accounts remain separate during the experiment and are converted at the end.</div>
         </div>
     </div>
+    {{ if show_name_form }}
+    <div class="response-form" style="margin-top:14px">
+        <div class="response-field blue">{{ formfield 'student_name' }}</div>
+    </div>
+    {{ endif }}
     <div class="response-actions">{{ next_button }}</div>
 </div>
 {{ endblock }}

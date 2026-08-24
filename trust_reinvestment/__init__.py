@@ -91,6 +91,11 @@ REALIZED_RETURN_CHOICES = [
 class Player(BasePlayer):
     role_label = models.StringField()
 
+    # Collected on the first page (drop-in classroom sessions have no
+    # pre-registered roster); copied to participant.label so the admin
+    # Monitor/Payments pages map payoffs to real people.
+    student_name = models.StringField(label="Your name or student ID")
+
     stage = models.IntegerField()
     stage2_round = models.IntegerField(blank=True)
 
@@ -709,6 +714,9 @@ def set_stage2_payoffs(group: Group):
 
 
 class Introduction(Page):
+    form_model = "player"
+    form_fields = ["student_name"]
+
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == 1
@@ -717,10 +725,15 @@ class Introduction(Page):
     def vars_for_template(player: Player):
         show_up_fee = float(player.session.config.get("participation_fee", 10.00))
         return dict(
+            show_name_form=True,
             part1_rate=f"¥{C.PART1_USD_PER_POINT:.2f}",
             part2_rate=f"¥{C.PART2_USD_PER_POINT:.2f}",
             show_up_fee=f"¥{show_up_fee:.2f}",
         )
+
+    @staticmethod
+    def before_next_page(player: Player, timeout_happened):
+        player.participant.label = player.student_name.strip()
 
 
 class Part1Instructions(Page):

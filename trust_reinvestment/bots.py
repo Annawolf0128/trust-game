@@ -109,7 +109,7 @@ class PlayerBot(Bot):
     def play_round(self):
         use_ai = ai_strategy_enabled(self.player)
         if self.round_number == 1:
-            yield Introduction
+            yield Introduction, dict(student_name=f"bot-{self.player.id_in_group}")
             yield Part1RulesIntro
             yield Part1Instructions
             yield Part1Quiz, dict(

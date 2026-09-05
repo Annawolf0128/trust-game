@@ -26,6 +26,12 @@
         <div class="response-field purple">{{ formfield 'risk_preference' }}</div>
         <div class="response-field green">{{ formfield 'trust_most_people' }}</div>
         <div class="response-field green">{{ formfield 'trust_willingness' }}</div>
+        <div class="response-field green">{{ formfield 'self_trustworthy' }}</div>
+        {{ if is_p1 }}
+        <div class="response-field orange">{{ formfield 'partner_trustworthy' }}</div>
+        {{ else }}
+        <div class="response-field orange">{{ formfield 'partner_trusting' }}</div>
+        {{ endif }}
         <div class="response-next">{{ next_button }}</div>
     </div>
 </div>

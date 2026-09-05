@@ -185,6 +185,11 @@ class PlayerBot(Bot):
                 risk_preference=5,
                 trust_most_people=6,
                 trust_willingness=5,
+                self_trustworthy=5,
             )
+            if self.player.id_in_group == 1:
+                survey_form["partner_trustworthy"] = 4
+            else:
+                survey_form["partner_trusting"] = 4
             yield Survey, survey_form
             yield Submission(FinalResults, check_html=False)

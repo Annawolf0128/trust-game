@@ -5,19 +5,43 @@
     :root{--ink:#0d1215;--stage:#232a33;--panel:#313d46;--line:#536473;--blue:#74b9f5;--orange:#ffad58;--green:#61cf93;--pink:#f486b2;--purple:#9b83ea;--yellow:#ffd166;--white:#f7f9fb}
     html,body{width:100%;min-height:100%;margin:0!important;background:var(--ink)!important}
     body>.container,.otree-body.container,.otree-body,main.container{max-width:none!important;width:100%!important;min-height:100vh!important;margin:0!important;padding:0!important;background:var(--ink)!important}.otree-title,.page-header{display:none!important}
-    .p2-shell{color:var(--white);font-family:Inter,Arial,sans-serif;background:var(--ink);min-height:100vh;border-radius:0;overflow:hidden}
+    .p2-shell{color:var(--white);font-family:Inter,Arial,sans-serif;background:var(--ink);min-height:100vh;border-radius:0;overflow:visible}
     .p2-head{height:74px;display:flex;align-items:center;gap:20px;padding:0 24px;border-bottom:2px solid #252e35}
     .p2-pill{background:var(--blue);color:#102131;border-radius:28px;padding:12px 26px;font-size:23px;font-weight:900;letter-spacing:.04em}
     .p2-title{font-size:27px;font-weight:850;flex:1}.p2-count{font-size:18px;font-weight:800;color:#cbd4db}
-    .p2-stage{position:relative;height:445px;margin:18px 24px 74px;background:var(--stage);border-radius:24px;overflow:hidden}
+    .p2-stage{display:none}
+    .account.one-line .account-balance{font-size:27px;line-height:1.35;margin-top:0}
+    .word-chip{font-size:34px;font-weight:950;letter-spacing:.02em;white-space:nowrap}
+    .pink-chip{color:#ff8fb3}.orange-chip{color:#ffb066}.purple-chip{color:#b39df1}.blue-chip{color:#74b9f5}.green-chip{color:#61cf93}
+    .wordflow{display:flex;flex-direction:column;gap:40px;align-items:center;width:100%}
+    .flow-row{display:flex;align-items:center;justify-content:center;gap:34px;width:86%;margin:0 auto}
+    .flow-mid{flex:1;display:flex;flex-direction:column;align-items:center;gap:12px;min-width:120px}
+    .flow-labels{display:flex;align-items:center;gap:24px}
+    .flow-labels.spread{width:100%;justify-content:space-between;padding:0 8px;box-sizing:border-box}
+    .flow-labels.spread-end{width:100%;justify-content:flex-end;padding:0 8px;box-sizing:border-box}
+    .flow-row.tight{gap:16px;width:96%}
+    .flow-row.tight .noise-grid{transform:scale(.82);margin:0 -18px}
+    .flow-row.tight .word-chip{font-size:22px;white-space:normal;text-align:center;line-height:1.2}
+    .flow-row.tight .flow-mid{min-width:110px}
+    .arrow-line{align-self:stretch;height:6px;background:#5b6a76;border-radius:3px;position:relative}
+    .arrow-line.right:after{content:"";position:absolute;right:-4px;top:50%;transform:translateY(-50%);border-left:20px solid #5b6a76;border-top:13px solid transparent;border-bottom:13px solid transparent}
+    .arrow-line.left:before{content:"";position:absolute;left:-4px;top:50%;transform:translateY(-50%);border-right:20px solid #5b6a76;border-top:13px solid transparent;border-bottom:13px solid transparent}
+    .p2-shell.with-visual .p2-stage{display:flex;align-items:center;justify-content:center;min-height:300px;margin:8px 6% 0;padding:16px 0;animation:visualIn .7s ease both}
+    .p2-shell.with-visual .p2-stage .scene{position:static;inset:auto;width:100%;padding:0}
+    .p2-shell.with-visual .payoff-card{border:4px solid var(--blue);border-radius:22px;padding:24px 30px;background:#29343c}
+    @keyframes visualIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
     .scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;animation:sceneIn .42s ease both}
-    .sentence-wrap{position:relative;min-height:154px;margin:0 42px}
-    .sentence{min-height:104px;margin:0;background:var(--panel);border-radius:20px;border-left:10px solid var(--blue);display:flex;flex-direction:column;gap:7px;align-items:center;justify-content:flex-start;text-align:center;padding:18px 34px;font-size:25px;line-height:1.35;font-weight:900}
-    .settled-line{font-size:25px;line-height:1.35;font-weight:900;text-align:center;margin:3px 0}
-    .active-sentence{position:absolute;z-index:20;left:4%;right:4%;top:-24px;transform:translateY(-50%);font-size:31px;line-height:1.35;font-weight:950;text-align:center;opacity:0;filter:drop-shadow(0 3px 9px #000);transition:top .72s ease,transform .72s ease,font-size .72s ease,opacity .35s ease;pointer-events:none}
-    .active-sentence.show{opacity:1}.active-sentence.drop{font-size:25px;filter:none}
+    .sentence-wrap{position:relative;min-height:110px;margin:34px 6% 230px;border-radius:20px;border-left:10px solid var(--blue);background:var(--stage);padding:26px 34px;box-sizing:border-box}
+    .sentence-wrap.grouped{background:transparent;border-left:none;padding:0}
+    .sentence-wrap.grouped .settled-group{background:var(--stage);border-left:10px solid var(--blue);border-radius:20px;padding:18px 30px;margin-bottom:24px}
+    .sentence-wrap.grouped .settled-group:last-child{margin-bottom:0}
+    .sentence{min-height:58px;margin:0;display:flex;flex-direction:column;gap:7px;align-items:center;justify-content:flex-start;text-align:center;padding:0;font-size:25px;line-height:1.35;font-weight:900}
+    .settled-line{font-size:28px;line-height:1.4;font-weight:900;text-align:center;margin:8px 0}
+    .active-sentence{position:absolute;z-index:20;left:4%;right:4%;top:calc(100% + 120px);transform:translateY(-50%);font-size:34px;line-height:1.35;font-weight:950;text-align:center;opacity:0;filter:drop-shadow(0 3px 9px #000);transition:top .72s ease,transform .72s ease,font-size .72s ease,opacity .35s ease;pointer-events:none}
+    .active-sentence.show{opacity:1}.active-sentence.drop{font-size:28px;filter:none}
     .value-blue{color:var(--blue);font-weight:950}
-    .controls{display:flex;align-items:center;justify-content:flex-end;gap:18px;margin:18px 38px 4px}.ctrl{min-width:166px;border-radius:15px;padding:16px 25px;border:3px solid #6c7a86;background:#36424c;color:var(--white);font-size:22px;font-weight:900}.ctrl.primary{background:var(--blue);border-color:var(--blue);color:#102131}.ctrl:disabled{opacity:.28}.otree-btn-next{display:none!important}
+    .controls{display:flex;align-items:center;justify-content:flex-end;gap:18px;margin:18px 38px 4px}
+    .p2-shell.center-controls{position:relative}.p2-shell.center-controls .controls{position:absolute;left:0;right:0;top:50%;margin:0;justify-content:center}.ctrl{min-width:166px;border-radius:15px;padding:16px 25px;border:3px solid #6c7a86;background:#36424c;color:var(--white);font-size:22px;font-weight:900}.ctrl.primary{background:var(--blue);border-color:var(--blue);color:#102131}.ctrl:disabled{opacity:.28}.otree-btn-next{display:none!important}
     .people{width:100%;display:flex;align-items:center;justify-content:center;gap:150px}.person-wrap{text-align:center;position:relative}.person{width:130px;height:180px;position:relative;margin:auto}.person:before{content:"";position:absolute;width:62px;height:62px;border-radius:50%;left:34px;top:0;background:var(--pc);border:4px solid #dbe7ee}.person:after{content:"";position:absolute;width:112px;height:105px;border-radius:28px;left:9px;top:75px;background:var(--pc)}.person-label{font-size:21px;font-weight:900;margin-top:12px}.p1{--pc:var(--blue)}.p2{--pc:var(--orange)}
     .assigned .person{filter:drop-shadow(0 0 18px var(--yellow));transform:scale(1.08)}.assigned-tag{position:absolute;top:-58px;left:50%;transform:translateX(-50%);background:var(--yellow);color:#182027;border-radius:16px;padding:7px 14px;font-size:15px;font-weight:950;white-space:nowrap}
     .fixed-link{width:190px;height:7px;background:var(--yellow);border-radius:10px;position:relative}.fixed-link:after{content:"SAME PARTNER";position:absolute;left:50%;top:-35px;transform:translateX(-50%);white-space:nowrap;color:var(--yellow);font-size:18px;font-weight:950}
@@ -33,14 +57,17 @@
     .payoff-grid{display:grid;grid-template-columns:1fr 1fr;gap:65px;width:90%}.payoff-card{display:flex;flex-direction:column;align-items:center;gap:18px}.formula{font-size:27px;font-weight:950;white-space:nowrap}.payoff-piles{display:flex;align-items:center;gap:18px}.small-pile{transform:scale(.76);margin:-8px -6px}.rate-card{border:4px solid var(--yellow);border-radius:25px;padding:38px 54px;text-align:center;background:#29343c}.rate-main{font-size:45px;font-weight:950;color:var(--yellow)}.rate-sub{font-size:22px;font-weight:900;margin-top:16px}.ready{font-size:56px;font-weight:950;color:var(--yellow);text-align:center}.subready{font-size:24px;font-weight:900;text-align:center;margin-top:22px}
     .move-right{animation:moveRight 1.05s ease both}.grow{animation:grow .9s ease both}.split-left{animation:splitLeft 1s ease both}.split-right{animation:splitRight 1s ease both}.drop-account{animation:dropAccount 1s ease both}.send-from-sources{animation:sendFromSources 1.35s .55s ease both}
     @keyframes sceneIn{from{opacity:0}to{opacity:1}}@keyframes pop{0%{opacity:0;transform:scale(.4)}70%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}@keyframes moveRight{from{transform:translateX(-170px);opacity:.2}to{transform:none;opacity:1}}@keyframes sendFromSources{0%{transform:translateX(-165px) scale(.08);opacity:0}35%{transform:translateX(-165px) scale(1);opacity:1}100%{transform:translateX(0) scale(1);opacity:1}}@keyframes grow{from{transform:scale(.25);opacity:.2}to{transform:scale(1);opacity:1}}@keyframes splitLeft{from{transform:translateX(95px)}to{transform:none}}@keyframes splitRight{from{transform:translateX(-95px)}to{transform:none}}@keyframes dropAccount{from{transform:translateY(-80px);opacity:.2}to{transform:none;opacity:1}}@keyframes returnFromReceived{0%,25%{opacity:0;transform:translateX(385px) scale(.18)}45%{opacity:1;transform:translateX(385px) scale(.88)}100%{opacity:1;transform:none}}
-    @media(max-width:850px){.p2-stage{height:420px;margin-bottom:64px}.people{gap:45px}.fixed-link{width:90px}.sentence-wrap{margin:0 14px}.sentence,.settled-line{font-size:20px}.active-sentence{top:-18px;font-size:25px}.active-sentence.drop{font-size:20px}.mechanic{gap:18px;transform:scale(.78)}.endowment-mechanic{padding:0 2%;transform:scale(.82)}.endowment-p1-group{gap:10px}.reinvest-flow{transform:scale(.64);gap:18px}.funding-sources{gap:8px;padding:14px 12px}.flow-arrow{width:48px}.payoff-grid{gap:16px;transform:scale(.72)}.noise-grid{transform:scale(.72)}.p2-title{font-size:21px}.ctrl{min-width:125px}}
-</style>
+    @media(max-width:850px){.p2-stage{height:420px;margin-bottom:64px}.people{gap:45px}.fixed-link{width:90px}.sentence-wrap{margin:0 14px}.sentence,.settled-line{font-size:20px}.active-sentence{top:calc(100% + 100px);font-size:27px}.active-sentence.drop{font-size:20px}.mechanic{gap:18px;transform:scale(.78)}.endowment-mechanic{padding:0 2%;transform:scale(.82)}.endowment-p1-group{gap:10px}.reinvest-flow{transform:scale(.64);gap:18px}.funding-sources{gap:8px;padding:14px 12px}.flow-arrow{width:48px}.payoff-grid{gap:16px;transform:scale(.72)}.noise-grid{transform:scale(.72)}.p2-title{font-size:21px}.ctrl{min-width:125px}}
+.hl-yellow{color:var(--yellow)}
+    </style>
 
 <div class="p2-shell" id="p2-shell"
      data-reinvestment="{{ is_reinvestment }}"
      data-noise="{{ has_noise }}"
      data-role="{{ role_number }}"
      data-min-rounds="{{ min_rounds }}"
+     data-max-rounds="{{ max_rounds }}"
+     data-stop-pct="{{ stop_pct }}"
      data-p1-rate="{{ part1_rate }}"
      data-p2-rate="{{ part2_rate }}">
     <div class="p2-head">
@@ -67,6 +94,8 @@
     const noise=shell.dataset.noise.toLowerCase()==='true';
     const role=Number(shell.dataset.role||1);
     const minRounds=shell.dataset.minRounds;
+    const maxRounds=shell.dataset.maxRounds||10;
+    const stopPct=shell.dataset.stopPct||30;
     const p1Rate=shell.dataset.p1Rate;
     const p2Rate=shell.dataset.p2Rate;
 
@@ -76,34 +105,39 @@
     function pileOnly(color,extra=''){return `<div class="abstract-pile ${color}-pile ${extra}">${fuzzyDots()}</div>`}
     function tenPile(color,label,extra=''){return `<div class="${extra}"><div class="ten-pile ${color}-pile">${'<i class="ten-coin"></i>'.repeat(10)}</div><div class="pile-label">${label}</div></div>`}
     function triplePile(color,label,extra=''){return `<div class="multi-pile-wrap"><div class="multi-piles">${pileOnly(color,extra)}${pileOnly(color,extra)}${pileOnly(color,extra)}</div><div class="pile-label">${label}</div></div>`}
+    function chip(color,label,extra=''){return `<div class="word-chip ${color}-chip ${extra}">${label}</div>`}
     function people(link=false){return `<div class="people">${person(1,role===1)}${link?'<div class="fixed-link"></div>':''}${person(2,role===2)}</div>`}
     const scenes=[];
     scenes.push({title:'Your role and matched participant',visual:people(true),text:['There are still two roles in this game: Player 1 and Player 2.',`You remain Player ${role}.`,'You remain matched with the same participant.']});
-    scenes.push({title:'How long Part 2 lasts',visual:`<div class="rounds"><div class="round-row">${[1,2,3,4].map(n=>`<div class="round-dot">${n}</div>`).join('')}<div class="round-dot">?</div></div></div>`,text:[`Part 2 lasts for at least ${minRounds} rounds.`,'The total number of rounds is determined by the computer and will not be announced in advance.']});
-    scenes.push({title:'Your accumulated Part 2 account',visual:`<div class="mechanic">${pile('green','previous balance','split-left')}<div class="operator">+</div>${pile('yellow','round earnings','split-right')}<div class="operator">=</div><div class="account drop-account"><div class="account-title">PART 2 ACCOUNT</div><div class="account-balance">new balance</div></div></div>`,text:['Your earnings from every round are added to your accumulated Part 2 account.','Your Part 2 payoff is equal to the final balance in your accumulated Part 2 account.','Your Part 1 payoff is recorded separately and is not included in your accumulated Part 2 account.']});
+    scenes.push({title:'How long Part 2 lasts',visual:`<div class="rounds"><div class="round-row">${Array.from({length:Number(minRounds)},(_,i)=>`<div class="round-dot">${i+1}</div>`).join('')}<div class="round-dot">?</div></div></div>`,text:[`Part 2 lasts for at least ${minRounds} rounds.`,`From round ${minRounds} on, the game ends with a ${stopPct}% chance after every round.`]});
+    scenes.push({title:'Your accumulated Part 2 account',visual:`<div class="mechanic">${pile('green','previous balance','split-left')}<div class="operator">+</div>${pile('yellow','round earnings','split-right')}<div class="operator">=</div><div class="account drop-account"><div class="account-title">PART 2 ACCOUNT</div><div class="account-balance">new balance</div></div></div>`,text:['Your earnings from every round are accumulated into your Part 2 account.','Your Part 2 payoff is equal to the final balance in your accumulated Part 2 account.','Your Part 1 payoff is recorded separately and is not included in your accumulated Part 2 account.']});
     scenes.push({title:'An endowment each round',visual:`<div class="mechanic endowment-mechanic"><div class="endowment-p1-group">${person(1)}${tenPile('blue','10-point endowment','grow')}</div>${person(2)}</div>`,text:['At the start of <span class="value-blue">every round</span>, Player 1 receives a 10-point endowment.','Player 2 receives no endowment.']});
-    if(reinvest){
-        scenes.push({title:'Sending in Part 2',visual:`<div class="new-badge">DIFFERENT FROM PART 1</div><div class="mechanic reinvest-flow">${person(1)}<div><div class="funding-caption">Player 1 chooses a whole number from 0 up to the total available amount</div><div class="funding-sources">${tenPile('blue','current endowment','split-left')}<div class="operator">+</div>${pile('green','accumulated account','split-right')}</div></div><div class="flow-step"><div class="flow-arrow"></div></div>${pile('pink','amount sent','send-from-sources')}<div class="flow-arrow"></div>${person(2)}</div>`,text:'The total available amount equals the current 10-point endowment plus the balance in the accumulated Part 2 account.'});
-    }else{
-        scenes.push({title:'Sending in each round',visual:`<div class="mechanic">${person(1)}${pile('blue','0–10 points','move-right')}<div class="arrow"></div>${person(2)}</div>`,text:'Player 1 chooses a whole number from 0 to 10 to send. The accumulated Part 2 account cannot be sent.'});
-    }
-    scenes.push({title:'Player 2 receives three times the amount sent',visual:`<div class="mechanic">${pile('pink','amount sent')}<div class="operator">× 3</div>${triplePile('orange','received','move-right')}${person(2)}</div>`,text:'Player 2 receives three times the amount Player 1 sent.'});
-    scenes.push({title:'Player 2 chooses a return',visual:`<div class="mechanic return-mechanic">${person(1)}<div class="return-flow"><div class="return-moving">${pile('purple','returned')}</div><div class="return-received">${triplePile('orange','received')}</div></div>${person(2)}</div>`,text:'Player 2 chooses a whole-number amount to return, from 0 up to the amount Player 2 received.'});
+    scenes.push({title:'Sending and returning',showVisual:true,visual:`<div class="wordflow"><div class="flow-row">${person(1)}<div class="flow-mid"><div class="flow-labels spread">${chip('pink','sent')}<div class="operator">× 3</div>${chip('orange','received')}</div><div class="arrow-line right"></div></div>${person(2)}</div><div class="flow-row">${person(1)}<div class="flow-mid"><div class="flow-labels spread-end">${chip('purple',noise?'chosen return':'returned')}</div><div class="arrow-line left"></div></div>${person(2)}</div></div>`,text:[
+        reinvest?'Player 1 can send Player 2 a whole number of points: from 0 up to the current 10-point endowment <span class="value-green">plus the balance in the accumulated Part 2 account</span>.':'Player 1 chooses a whole number from 0 to 10 to send. The accumulated Part 2 account cannot be sent.',
+        'Player 2 receives <span class="hl-yellow">three times</span> the amount Player 1 sent.',
+        'Player 2 chooses a whole-number amount to return to Player 1, from 0 up to the amount Player 2 received.']});
     if(noise){
-        scenes.push({title:'Computer adjustment',visual:`<div class="mechanic">${person(1)}${pile('purple','chosen return')}<div class="noise-grid"><div class="noise-card"><div class="noise-factor">× 0</div><div class="noise-prob">20%</div></div><div class="noise-card"><div class="noise-factor">× 1</div><div class="noise-prob">60%</div></div><div class="noise-card"><div class="noise-factor">× 2</div><div class="noise-prob">20%</div></div></div></div>`,text:['The computer randomly changes how many of the returned points reach Player 1.','20% chance: Player 1 receives no returned points.','60% chance: Player 1 receives exactly the amount Player 2 returned.','20% chance: Player 1 receives twice the amount Player 2 returned.']});
-        scenes.push({title:'Who is affected by the adjustment?',visual:`<div class="people">${person(1,true)}<div class="account"><div class="account-title">REALIZED RETURN</div><div class="account-balance">return × factor</div></div>${person(2,false)}</div>`,text:['The adjustment changes only Player 1’s realized return and payoff.','It never changes Player 2’s payoff.','With ×2, the amount reaching Player 1 may exceed the amount Player 2 received.']});
-        scenes.push({title:'What Player 1 observes',visual:`<div class="mechanic">${person(1)}${pile('purple','amount received','grow')}<div class="operator">?</div>${pile('purple','chosen return')}${person(2)}</div>`,text:'Player 1 sees only the amount received—not Player 2’s chosen return or the computer multiplier.'});
+        scenes.push({title:'Computer adjustment',showVisual:true,visual:`<div class="flow-row tight">${person(1)}<div class="flow-mid"><div class="arrow-line left"></div></div><div class="noise-grid"><div class="noise-card"><div class="noise-factor">× 0</div><div class="noise-prob">20%</div></div><div class="noise-card"><div class="noise-factor">× 1</div><div class="noise-prob">60%</div></div><div class="noise-card"><div class="noise-factor">× 2</div><div class="noise-prob">20%</div></div></div><div class="flow-mid"><div class="flow-labels">${chip('purple','chosen return')}</div><div class="arrow-line left"></div></div>${person(2)}</div>`,text:['The computer randomly changes how much of the chosen return reaches Player 1.','20% chance: Player 1 receives 0 points, no matter how much Player 2 chooses to return.','60% chance: Player 1 receives exactly the amount Player 2 chooses to return.','20% chance: Player 1 receives twice the amount Player 2 chooses to return.']});
+        scenes.push({title:'Who is affected by the adjustment?',showVisual:true,visual:`<div class="wordflow"><div class="people">${person(1,role===1)}<div class="account one-line"><div class="account-balance">realized return =<br>chosen return × random multiplier</div></div>${person(2,role===2)}</div><div class="noise-grid"><div class="noise-card"><div class="noise-factor">× 0</div><div class="noise-prob">20%</div></div><div class="noise-card"><div class="noise-factor">× 1</div><div class="noise-prob">60%</div></div><div class="noise-card"><div class="noise-factor">× 2</div><div class="noise-prob">20%</div></div></div></div>`,text:['The random multiplier only changes the amount that Player 1 receives.','With ×2, the amount reaching Player 1 may exceed the amount Player 1 sent.','Player 1 sees only the amount received—not Player 2\u2019s chosen return or the random multiplier.','Player 2 can see the amount that Player 1 received at the end of each round.']});
     }
-    scenes.push({title:'Round payoff',visual:`<div class="payoff-grid"><div class="payoff-card">${person(1)}<div class="payoff-piles">${pile('blue','kept','small-pile')}<div class="operator">+</div>${pile('purple',noise?'realized return':'returned','small-pile')}</div><div class="formula">Kept + ${noise?'realized return':'returned'}</div></div><div class="payoff-card">${person(2)}<div class="payoff-piles">${pile('orange','received','small-pile')}<div class="operator">−</div>${pile('purple','returned','small-pile')}</div><div class="formula">Received − returned</div></div></div>`,text:[`Player 1’s round payoff equals the points kept plus the ${noise?'realized return after the computer adjustment':'points returned'}.`,'Player 2’s round payoff equals the points received minus the points returned.']});
-    if(!reinvest){
-        scenes.push({title:'The account is protected',visual:`<div class="mechanic"><div class="lock">🔒</div><div class="account"><div class="account-title">PART 2 ACCOUNT</div><div class="account-balance">accumulates</div></div></div>`,text:'Your accumulated Part 2 account determines payment, but it cannot be used for later sends.'});
-    }
-    scenes.push({title:'Ready for the understanding test',visual:`<div><div class="ready">Part 2 rules complete</div><div class="subready">You must pass the understanding test before making payoff-relevant choices.</div></div>`,text:'Select “Start understanding test” when you are ready.'});
+    scenes.push({title:'Round payoff',visual:`<div class="payoff-grid"><div class="payoff-card">${person(1)}<div class="formula">Kept + ${noise?'realized return':'returned'}</div></div><div class="payoff-card">${person(2)}<div class="formula">Received − returned</div></div></div>`,text:[`Player 1’s round payoff = points kept + ${noise?'realized return (after the computer adjustment)':'points returned'}.`,'Player 2’s round payoff = points received − points returned.'],showVisual:true});
+    scenes.push({title:'Ready for the understanding test',visual:`<div><div class="ready">Part 2 rules complete</div><div class="subready">You must pass the understanding test before making payoff-relevant choices.</div></div>`,text:'Before Part 2 starts, you need to pass the understanding test of the Part 2 game rules.'});
 
     let index=0,timer=null,lineIndex=0,currentLines=[],settledCurrent=false;
     const stage=document.getElementById('scene-stage'), sentence=document.getElementById('scene-sentence'), active=document.getElementById('active-sentence'), title=document.getElementById('scene-title'), count=document.getElementById('scene-count'), prev=document.getElementById('prev-step'), next=document.getElementById('next-step');
     function sceneLines(){const text=scenes[index].text;return Array.isArray(text)?text:[text]}
-    function setSettled(lines){sentence.innerHTML=lines.map(line=>`<div class="settled-line">${line}</div>`).join('')}
+    function setSettled(lines){
+        const groups=scenes[index].groups;
+        if(!groups){sentence.innerHTML=lines.map(line=>`<div class="settled-line">${line}</div>`).join('');return}
+        let html='',i=0;
+        for(const g of groups){
+            const chunk=lines.slice(i,i+g);
+            if(!chunk.length)break;
+            html+=`<div class="settled-group">${chunk.map(line=>`<div class="settled-line">${line}</div>`).join('')}</div>`;
+            i+=g;
+        }
+        sentence.innerHTML=html;
+    }
     function readingTime(text){return Math.min(11000,Math.max(4600,2500+text.replace(/<[^>]+>/g,'').length*42))}
     function showNextLine(){
         const lines=sceneLines();
@@ -114,7 +148,8 @@
         timer=setTimeout(finishLine,readingTime(lines[lineIndex]));
     }
     function finishLine(){
-        active.style.top=`${18+lineIndex*38}px`;
+        let gi=0;if(scenes[index].groups){let acc=0;for(const g of scenes[index].groups){if(lineIndex>=acc+g){gi++;acc+=g}else break}}
+        active.style.top=`${40+lineIndex*55+gi*52}px`;
         active.classList.add('drop');
         timer=setTimeout(()=>{
             currentLines.push(sceneLines()[lineIndex]);
@@ -135,6 +170,7 @@
         lineIndex=0;
         currentLines=[];
         settledCurrent=!animate;
+        shell.classList.toggle('with-visual',!!s.showVisual);document.querySelector('.sentence-wrap').classList.toggle('grouped',!!s.groups);shell.classList.toggle('center-controls',index===scenes.length-1);
         title.textContent='Part 2 Game Rules';
         count.textContent=`Instruction ${index+1} of ${scenes.length}`;
         stage.innerHTML=`<div class="scene">${s.visual}</div>`;

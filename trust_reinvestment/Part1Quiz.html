@@ -17,10 +17,8 @@
             <div class="quiz-error-copy">Please review the questions marked below and try again.</div>
         </div>
         {{ endif }}
-        <div class="quiz-form-heading">
-            <div class="response-form-title">Use the same example for all three questions</div>
-            <button type="button" class="quiz-review-button" data-rule-review-open="part1-rule-review">Review game rules</button>
-        </div>
+        <div class="quiz-review-row"><button type="button" class="quiz-review-button" data-rule-review-open="part1-rule-review">Review game rules</button><span class="quiz-review-hint">Forgot a rule? You can review the game rules at any time.</span></div>
+        <div class="quiz-form-heading"><div class="response-form-title">Use the same example for all three questions</div></div>
         <div class="part1-example">
             <div class="part1-flow"><div class="part1-step">Player 1 starts with 10</div><div class="part1-arrow">→</div><div class="part1-step">Sends 4</div><div class="part1-arrow">× 3</div><div class="part1-step orange">Player 2 receives ?</div><div class="part1-arrow">→</div><div class="part1-step orange">Returns 5</div></div>
         </div>
@@ -41,7 +39,7 @@
                 <div class="rules-review-item"><strong>1.</strong> Player 1 starts with <strong class="value-blue">10 points</strong>. Player 2 receives no initial endowment.</div>
                 <div class="rules-review-item"><strong>2.</strong> Player 1 chooses a whole number from <strong class="value-blue">0 to 10</strong> to send.</div>
                 <div class="rules-review-item"><strong>3.</strong> Player 2 receives <strong class="value-yellow">three times</strong> the amount Player 1 sent.</div>
-                <div class="rules-review-item"><strong>4.</strong> Player 2 chooses a whole-number amount to return, from 0 up to the amount received.</div>
+                <div class="rules-review-item"><strong>4.</strong> Player 2 chooses a whole-number amount to return to Player 1, from 0 up to the amount received.</div>
                 <div class="rules-review-formula"><strong>Player 1 payoff</strong> = 10 − amount sent + amount returned</div>
                 <div class="rules-review-formula orange"><strong>Player 2 payoff</strong> = three times the amount sent − amount returned</div>
                 <div class="rules-review-item">Your role and matched participant are randomly assigned after you submit your Part 1 decisions.</div>

@@ -2,19 +2,23 @@ from os import environ
 
 SESSION_CONFIG_DEFAULTS = dict(
     # Parts 1 and 2 use the same exchange rate.
-    real_world_currency_per_point=0.10,
+    real_world_currency_per_point=0.05,
     participation_fee=10.00,
+    # Every session actually runs exactly 5 Part 2 rounds. The interface still
+    # describes the random stopping rule (min 4, 25% per round); this default
+    # overrides the draw session-wide.
+    fixed_stage2_rounds=5,
     doc="Two-person allocation task",
 )
 
 SESSION_CONFIGS = [
-    # Official session: 24 participants are assigned random roles and random
-    # partners, forming 12 pairs. The pairs are then randomized across the four
-    # Part 2 cells with exactly 3 pairs per cell. Part 1 choices are retained as
-    # analysis covariates but never affect roles, matches, or cell assignment.
+    # Official session: any EVEN number of participants can start (under or
+    # over 24). Random roles and random partners form pairs; pairs are assigned
+    # to the four Part 2 cells cyclically (pair 1 -> cell 1, ..., pair 5 ->
+    # cell 1 again), so cells stay as balanced as possible at any size.
     dict(
         name="official",
-        display_name="OFFICIAL — 24 participants, four balanced blocks",
+        display_name="OFFICIAL — any even headcount, cyclic blocks (default 24)",
         num_demo_participants=24,
         app_sequence=["trust_reinvestment"],
     ),
@@ -30,54 +34,21 @@ SESSION_CONFIGS = [
         # only say the computer decides the number of rounds).
         fixed_stage2_rounds=5,
     ),
-    dict(
-        name="trial_no_reinvestment_no_noise",
-        display_name="Trial Cell: No reinvestment, no noise",
-        num_demo_participants=2,
-        app_sequence=["trust_reinvestment"],
-        forced_treatment="no_reinvestment",
-        forced_noise="no_noise",
-    ),
-    dict(
-        name="trial_no_reinvestment_noise",
-        display_name="Trial Cell: No reinvestment, noise",
-        num_demo_participants=2,
-        app_sequence=["trust_reinvestment"],
-        forced_treatment="no_reinvestment",
-        forced_noise="noise",
-    ),
-    dict(
-        name="trial_reinvestment_no_noise",
-        display_name="Trial Cell: Reinvestment, no noise",
-        num_demo_participants=2,
-        app_sequence=["trust_reinvestment"],
-        forced_treatment="reinvestment",
-        forced_noise="no_noise",
-    ),
-    dict(
-        name="trial_reinvestment_noise",
-        display_name="Trial Cell: Reinvestment, noise",
-        num_demo_participants=2,
-        app_sequence=["trust_reinvestment"],
-        forced_treatment="reinvestment",
-        forced_noise="noise",
-    ),
-    # Fast, single-participant full-flow tests. Each path starts in Part 1,
-    # then continues into its specified Part 2 cell and role. Counterpart
-    # decisions are simulated so these paths never wait for another browser.
+    # TEST sessions: identical to the official configuration (same app, same
+    # exchange rate/fee, same session-level 4-7 round draw), except each session
+    # has exactly 2 participants who are paired together, with the Part 2 cell
+    # forced so every block can be inspected directly.
     *[
         dict(
-            name=f"test_{treatment}_{noise}_player{role}",
+            name=f"test_{treatment}_{noise}",
             display_name=(
                 f"TEST — {'Reinvestment' if treatment == 'reinvestment' else 'No reinvestment'}, "
-                f"{'noise' if noise == 'noise' else 'no noise'}, Player {role}"
+                f"{'noise' if noise == 'noise' else 'no noise'} (2 participants, one pair)"
             ),
-            num_demo_participants=1,
-            app_sequence=["preview_part1", "preview_part2"],
-            preview_treatment=treatment,
-            preview_noise=noise,
-            preview_role=role,
-            fast_role_test=True,
+            num_demo_participants=2,
+            app_sequence=["trust_reinvestment"],
+            forced_treatment=treatment,
+            forced_noise=noise,
         )
         for treatment, noise in [
             ("no_reinvestment", "no_noise"),
@@ -85,12 +56,32 @@ SESSION_CONFIGS = [
             ("reinvestment", "no_noise"),
             ("reinvestment", "noise"),
         ]
-        for role in [1, 2]
+    ],
+    # Full-room single-cell sessions: 24 participants (12 pairs), every pair
+    # forced into the same Part 2 cell.
+    *[
+        dict(
+            name=f"all24_{treatment}_{noise}",
+            display_name=(
+                f"ALL-24 — {'Reinvestment' if treatment == 'reinvestment' else 'No reinvestment'}, "
+                f"{'noise' if noise == 'noise' else 'no noise'} (24 participants, one block)"
+            ),
+            num_demo_participants=24,
+            app_sequence=["trust_reinvestment"],
+            forced_treatment=treatment,
+            forced_noise=noise,
+        )
+        for treatment, noise in [
+            ("no_reinvestment", "no_noise"),
+            ("no_reinvestment", "noise"),
+            ("reinvestment", "no_noise"),
+            ("reinvestment", "noise"),
+        ]
     ],
 ]
 
 LANGUAGE_CODE = "en"
-REAL_WORLD_CURRENCY_CODE = "CNY"
+REAL_WORLD_CURRENCY_CODE = "SGD"
 USE_POINTS = True
 
 ROOMS = [

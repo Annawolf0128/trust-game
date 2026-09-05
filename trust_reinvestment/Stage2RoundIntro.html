@@ -34,4 +34,17 @@ document.getElementById('round-start').addEventListener('click', function(){
     document.querySelector('.otree-btn-next').click();
 });
 </script>
+<div class="acct-jar" title="Your accumulated Part 2 account">
+    <div class="acct-jar-icon"><div class="acct-jar-lid"></div><div class="acct-jar-body"><div class="acct-jar-fill"></div></div></div>
+    <div class="acct-jar-text"><div class="acct-jar-label">PART 2 ACCOUNT</div><div class="acct-jar-value">{{ account }}</div></div>
+</div>
+<style>
+.acct-jar{position:fixed;top:92px;right:22px;z-index:5000;display:flex;align-items:center;gap:12px;background:#1c242c;border:2px solid #3a4753;border-radius:16px;padding:10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.acct-jar-lid{width:18px;height:5px;background:#9fb0bd;border-radius:2px;margin:0 auto 2px}
+.acct-jar-body{width:26px;height:32px;margin:0 auto;border:2.5px solid #9fb0bd;border-radius:6px 6px 10px 10px;position:relative;overflow:hidden}
+.acct-jar-fill{position:absolute;left:0;right:0;bottom:0;height:62%;background:#61cf93;opacity:.85}
+.acct-jar-label{font-size:11px;font-weight:900;letter-spacing:.08em;color:#9fb0bd}
+.acct-jar-value{font-size:22px;font-weight:950;color:#61cf93;line-height:1.1}
+@media(max-width:850px){.acct-jar{top:auto;bottom:16px;right:12px;padding:8px 12px}}
+</style>
 {{ endblock }}

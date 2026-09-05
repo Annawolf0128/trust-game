@@ -1,18 +1,13 @@
 {{ block title }}{{ endblock }}
 {{ block content }}
 <link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
+<style>
+    .rules-intro-only{min-height:60vh;display:flex;align-items:center;justify-content:center}
+    .rules-intro-only .otree-btn-next{font-size:22px;padding:16px 38px;border-radius:14px}
+</style>
 <div class="response-shell">
-    <div class="response-head">
-        <div class="response-pill">PART 2</div>
-        <div class="response-title">The next part</div>
-        <div class="response-count">Get ready</div>
+    <div class="rules-intro-only">
+        <button class="otree-btn-next btn btn-primary">Learn Part 2 game rules</button>
     </div>
-    <div class="response-stage results">
-        <div class="response-lines">
-            <div class="response-line"><strong class="value-yellow">Part 2 is about to begin.</strong></div>
-            <div class="response-line">Next, you will learn the Part 2 rules.</div>
-        </div>
-    </div>
-    <div class="response-actions"><button class="otree-btn-next btn btn-primary">Continue to Part 2</button></div>
 </div>
 {{ endblock }}

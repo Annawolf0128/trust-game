@@ -6,21 +6,53 @@
         <div class="response-pill">PART 2</div><div class="response-title">Round results</div><div class="response-count">Round {{ stage2_round }}</div>
     </div>
     {{ if view_as_p1 }}
-        <div class="response-stage">
-            <div class="response-lines">
-                <div class="response-line">You sent <strong class="value-blue">{{ player.transfer }}</strong> from this round's endowment.</div>
-                {{ if is_reinvestment }}
-                    <div class="response-line">You also used <strong class="value-green">{{ player.reinvestment }}</strong> from your Part 2 accumulated account.</div>
-                {{ endif }}
-                <div class="response-line">Player 2 received <strong class="value-orange">{{ received_amount }}</strong>.</div>
-                <div class="response-line response-highlight">The amount that reached you was <strong class="value-purple">{{ realized_return }}</strong>.</div>
-                <div class="response-line">Your payoff this round is <strong class="value-yellow">{{ player.round_payoff }}</strong>.</div>
-                <div class="response-line">Your Part 2 accumulated account is now <strong class="value-green">{{ account_balance }}</strong>.</div>
+        <div class="response-stage p2-results-stage">
+            <div class="p2-results-layout">
+                <section class="p2-result-card decisions" aria-labelledby="p1-round-decisions">
+                    <h2 id="p1-round-decisions" class="p2-result-card-title">Round decisions</h2>
+                    <div class="p2-result-row blue">
+                        <span>You sent from this round's endowment</span>
+                        <strong>{{ player.transfer }}</strong>
+                    </div>
+                    {{ if is_reinvestment }}
+                    <div class="p2-result-row green">
+                        <span>You sent from your accumulated account</span>
+                        <strong>{{ player.reinvestment }}</strong>
+                    </div>
+                    {{ endif }}
+                    <div class="p2-result-row orange">
+                        <span>Player 2 received</span>
+                        <strong>{{ received_amount }}</strong>
+                    </div>
+                    <div class="p2-result-row purple">
+                        <span>{{ if has_noise }}The amount that reached you{{ else }}Player 2 returned{{ endif }}</span>
+                        <strong>{{ realized_return }}</strong>
+                    </div>
+                </section>
+
+                <section class="p2-result-card earnings" aria-labelledby="p1-round-earnings">
+                    <h2 id="p1-round-earnings" class="p2-result-card-title">Your earnings</h2>
+                    <div class="p2-result-metric payoff">
+                        <span>Your round payoff</span>
+                        <strong>{{ player.round_payoff }}</strong>
+                    </div>
+                    <div class="p2-result-metric account">
+                        <span>Your Part 2 accumulated account</span>
+                        <strong>{{ account_balance }}</strong>
+                    </div>
+                </section>
+
                 {{ if should_continue }}
-                    <div class="response-line">The interaction <strong class="value-green">will continue to the next round</strong>.</div>
+                    <section class="p2-result-next" aria-label="Next-round status">
+                        <span>Next round</span>
+                        <strong>The interaction will continue.</strong>
+                    </section>
                 {{ else }}
                     {{ if pilot_forced_stop }}
-                        <div class="response-line">The game <strong class="value-yellow">has stopped</strong>.</div>
+                        <section class="p2-result-next stopped" aria-label="Game status">
+                            <span>Game status</span>
+                            <strong>The game has stopped.</strong>
+                        </section>
                     {{ endif }}
                 {{ endif }}
             </div>
@@ -42,16 +74,22 @@
                         <span>You returned</span>
                         <strong>{{ player.intended_return }}</strong>
                     </div>
+                    {{ if has_noise }}
+                    <div class="p2-result-row green">
+                        <span>The amount that reached Player 1</span>
+                        <strong>{{ realized_return }}</strong>
+                    </div>
+                    {{ endif }}
                 </section>
 
                 <section class="p2-result-card earnings" aria-labelledby="p2-round-earnings">
                     <h2 id="p2-round-earnings" class="p2-result-card-title">Your earnings</h2>
                     <div class="p2-result-metric payoff">
-                        <span>Round payoff</span>
+                        <span>Your round payoff</span>
                         <strong>{{ player.round_payoff }}</strong>
                     </div>
                     <div class="p2-result-metric account">
-                        <span>Part 2 accumulated account</span>
+                        <span>Your Part 2 accumulated account</span>
                         <strong>{{ account_balance }}</strong>
                     </div>
                 </section>
@@ -86,4 +124,17 @@
         <div class="response-form"><div class="response-next">{{ next_button }}</div></div>
     {{ endif }}
 </div>
+<div class="acct-jar" title="Your accumulated Part 2 account">
+    <div class="acct-jar-icon"><div class="acct-jar-lid"></div><div class="acct-jar-body"><div class="acct-jar-fill"></div></div></div>
+    <div class="acct-jar-text"><div class="acct-jar-label">PART 2 ACCOUNT</div><div class="acct-jar-value">{{ account_balance }}</div></div>
+</div>
+<style>
+.acct-jar{position:fixed;top:92px;right:22px;z-index:5000;display:flex;align-items:center;gap:12px;background:#1c242c;border:2px solid #3a4753;border-radius:16px;padding:10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.acct-jar-lid{width:18px;height:5px;background:#9fb0bd;border-radius:2px;margin:0 auto 2px}
+.acct-jar-body{width:26px;height:32px;margin:0 auto;border:2.5px solid #9fb0bd;border-radius:6px 6px 10px 10px;position:relative;overflow:hidden}
+.acct-jar-fill{position:absolute;left:0;right:0;bottom:0;height:62%;background:#61cf93;opacity:.85}
+.acct-jar-label{font-size:11px;font-weight:900;letter-spacing:.08em;color:#9fb0bd}
+.acct-jar-value{font-size:22px;font-weight:950;color:#61cf93;line-height:1.1}
+@media(max-width:850px){.acct-jar{top:auto;bottom:16px;right:12px;padding:8px 12px}}
+</style>
 {{ endblock }}

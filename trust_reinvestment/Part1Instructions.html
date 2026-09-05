@@ -3,20 +3,25 @@
 {{ block content }}
 <style>
     :root{--ink:#0d1215;--stage:#232a33;--panel:#313d46;--blue:#74b9f5;--orange:#ffad58;--pink:#f486b2;--purple:#9b83ea;--yellow:#ffd166;--white:#f7f9fb;--muted:#cbd4db}
-    html,body{width:100%;height:100%;min-height:100%;margin:0!important;padding:0!important;overflow:hidden;background:var(--ink)!important}
+    html,body{width:100%;height:100%;min-height:100%;margin:0!important;padding:0!important;overflow-y:auto;background:var(--ink)!important}
     body>.container,.otree-body.container,.otree-body,main.container{max-width:none!important;width:100%!important;height:100%!important;min-height:100vh!important;margin:0!important;padding:0!important;background:var(--ink)!important}.otree-title,.page-header{display:none!important}
     .otree-form,._otree-content{width:100%!important;height:100%!important;min-height:100vh!important;margin:0!important;padding:0!important}
-    .p1-shell{height:100vh;min-height:720px;overflow:hidden;background:var(--ink);color:var(--white);font-family:Inter,Arial,sans-serif;display:flex;flex-direction:column}
+    .p1-shell{min-height:100vh;overflow:visible;background:var(--ink);color:var(--white);font-family:Inter,Arial,sans-serif;display:flex;flex-direction:column}
     .p1-head{height:78px;flex:0 0 78px;display:flex;align-items:center;gap:22px;padding:0 30px;border-bottom:2px solid #252e35}
     .p1-pill{background:var(--blue);color:#102131;border-radius:30px;padding:13px 28px;font-size:23px;font-weight:950;letter-spacing:.04em}.p1-title{font-size:29px;font-weight:900;flex:1}.p1-count{font-size:20px;font-weight:850;color:var(--muted)}
-    .p1-stage{position:relative;flex:1;min-height:0;margin:16px 24px 8px;background:var(--stage);border-radius:25px;overflow:hidden}
-    .visual-zone{position:absolute;inset:0 0 250px;display:flex;align-items:center;justify-content:center;padding:28px 55px}
+    .p1-stage{position:relative;flex:1;min-height:560px;margin:16px 24px 8px;background:var(--stage);border-radius:25px;overflow:hidden}
+    .visual-zone{display:none}
+    .p1-stage.with-visual .visual-zone{display:flex;align-items:center;justify-content:center;position:absolute;left:6%;right:6%;top:250px;bottom:4%;animation:visualIn .7s ease both}
+    .payoff-caption{font-size:27px;font-weight:950;white-space:nowrap}.payoff-caption .cap-sign{color:var(--yellow);font-weight:950}
+    .payoff-card{display:flex;flex-direction:column;align-items:center;gap:22px;border:4px solid var(--blue);border-radius:22px;padding:24px 36px;background:#29343c}
+    @keyframes visualIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
     .visual-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;animation:sceneIn .45s ease both}
-    .sentence-dock{position:absolute;left:5%;right:5%;bottom:18px;min-height:116px;border-radius:20px;border-left:10px solid var(--blue);background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:15px 30px;overflow:hidden}
-    .settled-line{font-size:23px;line-height:1.35;font-weight:900;text-align:center;margin:4px 0}
-    .active-sentence{position:absolute;z-index:20;left:8%;right:8%;top:calc(100% - 190px);transform:translateY(-50%);font-size:31px;line-height:1.35;font-weight:950;text-align:center;opacity:0;filter:drop-shadow(0 3px 9px #000);transition:top .72s ease,transform .72s ease,font-size .72s ease,opacity .35s ease}
-    .active-sentence.show{opacity:1}.active-sentence.setup-last{top:calc(100% - 250px)}.active-sentence.drop{font-size:23px;filter:none}
-    .p1-controls{height:78px;flex:0 0 78px;display:flex;align-items:center;justify-content:flex-end;gap:20px;padding:0 32px 12px}.p1-btn{min-width:180px;border-radius:15px;padding:15px 26px;border:3px solid #6c7a86;background:#36424c;color:var(--white);font-size:22px;font-weight:950}.p1-btn.primary{background:var(--blue);border-color:var(--blue);color:#102131}.p1-btn:disabled{opacity:.26;cursor:not-allowed}.native-next{display:none!important}
+    .sentence-dock{position:absolute;left:6%;right:6%;top:6%;border-radius:20px;border-left:10px solid var(--blue);background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:26px 34px;max-height:88%;overflow:auto}
+    .settled-line{font-size:28px;line-height:1.4;font-weight:900;text-align:center;margin:8px 0}
+    .active-sentence{position:absolute;z-index:20;left:8%;right:8%;top:70%;transform:translateY(-50%);font-size:34px;line-height:1.35;font-weight:950;text-align:center;opacity:0;filter:drop-shadow(0 3px 9px #000);transition:top .72s ease,transform .72s ease,font-size .72s ease,opacity .35s ease}
+    .active-sentence.show{opacity:1}.active-sentence.setup-last{top:70%}.active-sentence.drop{font-size:28px;filter:none}
+    .p1-controls{height:78px;flex:0 0 78px;display:flex;align-items:center;justify-content:flex-end;gap:20px;padding:0 32px 12px}
+    .p1-shell.center-controls{position:relative}.p1-shell.center-controls .p1-controls{position:absolute;left:0;right:0;top:50%;height:auto;padding:0;justify-content:center}.p1-btn{min-width:180px;border-radius:15px;padding:15px 26px;border:3px solid #6c7a86;background:#36424c;color:var(--white);font-size:22px;font-weight:950}.p1-btn.primary{background:var(--blue);border-color:var(--blue);color:#102131}.p1-btn:disabled{opacity:.26;cursor:not-allowed}.native-next{display:none!important}
     .people{width:100%;display:flex;align-items:center;justify-content:center;gap:170px}.person-wrap{text-align:center;position:relative}.person{width:128px;height:176px;position:relative;margin:auto}.person:before{content:"";position:absolute;width:60px;height:60px;border-radius:50%;left:34px;top:0;background:var(--pc);border:4px solid #dbe7ee}.person:after{content:"";position:absolute;width:108px;height:101px;border-radius:27px;left:10px;top:74px;background:var(--pc)}.person-label{font-size:21px;font-weight:900;margin-top:12px}.player1{--pc:var(--blue)}.player2{--pc:var(--orange)}
     .four-people{display:grid;grid-template-columns:repeat(4,1fr);gap:95px;align-items:center}.four-people .person{transform:scale(.78);transform-origin:bottom}.four-people .person-label{font-size:17px;margin-top:10px}.matched{filter:drop-shadow(0 0 17px var(--yellow))}.match-link{width:150px;height:7px;border-radius:8px;background:var(--yellow);position:absolute;left:50%;top:48%;transform:translate(-50%,-50%)}.match-link:after{content:"RANDOM PAIR";position:absolute;left:50%;top:-35px;transform:translateX(-50%);white-space:nowrap;color:var(--yellow);font-size:17px;font-weight:950}
     .rule-divider{text-align:center}.divider-main{font-size:67px;font-weight:950;color:var(--yellow);letter-spacing:.04em}.divider-sub{font-size:38px;font-weight:900;margin-top:18px}
@@ -30,7 +35,8 @@
     .split{animation:split .9s ease both}.move-right{animation:moveRight 1s ease both}.move-left{animation:moveLeft 1s ease both}.grow{animation:grow .9s ease both}.payoff-grid{display:grid;grid-template-columns:1fr 1fr;gap:120px;align-items:center}.payoff-side{text-align:center}.payoff-name{font-size:25px;font-weight:950;margin-bottom:22px}.payoff-formula{display:flex;align-items:center;justify-content:center;gap:18px}.payoff-sign{font-size:57px;font-weight:950;color:var(--yellow)}.ready{font-size:59px;font-weight:950;color:var(--yellow);text-align:center}.ready-sub{font-size:25px;font-weight:900;text-align:center;margin-top:20px}
     @keyframes sceneIn{from{opacity:0}to{opacity:1}}@keyframes split{from{transform:scale(.35);opacity:.15}to{transform:none;opacity:1}}@keyframes moveRight{from{transform:translateX(-170px);opacity:.2}to{transform:none;opacity:1}}@keyframes moveLeft{from{transform:translateX(170px);opacity:.2}to{transform:none;opacity:1}}@keyframes grow{from{transform:scale(.2);opacity:.15}to{transform:none;opacity:1}}@keyframes originDivide{0%,25%{opacity:1;transform:scale(1)}39%{opacity:.3;transform:scale(.84)}47%,100%{opacity:0;transform:scale(.68)}}@keyframes divideLeft{0%,25%{opacity:0;transform:translateX(4px) scale(.7)}42%,62%{opacity:1;transform:translateX(4px) scale(1)}100%{opacity:1;transform:none}}@keyframes divideAndSend{0%,25%{opacity:0;transform:translateX(-471px) scale(.7)}42%,58%{opacity:1;transform:translateX(-471px) scale(1)}100%{opacity:1;transform:none}}@keyframes returnFromReceived{0%,25%{opacity:0;transform:translateX(385px) scale(.18)}45%{opacity:1;transform:translateX(385px) scale(.88)}100%{opacity:1;transform:none}}
     @media(max-width:900px){.p1-head{padding:0 16px}.p1-title{font-size:23px}.p1-count{font-size:16px}.p1-stage{margin:10px 10px 6px}.visual-zone{padding:20px}.people{gap:55px}.mechanic{gap:18px;transform:scale(.78)}.endowment-mechanic{padding:0 2%;transform:scale(.82)}.endowment-p1-group{gap:10px}.four-people{gap:20px}.active-sentence{font-size:25px}.settled-line{font-size:19px}.payoff-grid{gap:24px;transform:scale(.75)}.p1-btn{min-width:135px}}
-</style>
+.hl-yellow{color:var(--yellow)}
+    </style>
 
 <div class="p1-shell" id="part1Instructions">
     <div class="p1-head"><div class="p1-pill">PART 1</div><div class="p1-title" id="p1Title"></div><div class="p1-count" id="p1Count"></div></div>
@@ -59,13 +65,9 @@
         {scene:'divider',title:'Game rules in Part 1',visual:'<div class="rule-divider"><div class="divider-main">GAME RULES</div><div class="divider-sub">IN PART 1</div></div>',text:'Now, let us learn how Player 1 and Player 2 make decisions and earn points.'},
         {scene:'endowment',title:'Player 1 receives an endowment',visual:`<div class="mechanic endowment-mechanic"><div class="endowment-p1-group">${person(1)}${tenPile('blue','10 points','grow')}</div>${person(2)}</div>`,text:'Player 1 receives an endowment of 10 points.'},
         {scene:'endowment',title:'Player 2 receives no endowment',visual:`<div class="mechanic endowment-mechanic"><div class="endowment-p1-group">${person(1)}${tenPile('blue','10 points')}</div>${person(2)}</div>`,text:'Player 2 does not receive an initial endowment in Part 1.'},
-        {scene:'send',title:'Player 1 chooses an amount to send',visual:`<div class="mechanic send-mechanic">${person(1)}<div class="split-area"><div class="split-origin">${tenPile('blue','10 points')}</div><div class="split-target kept">${pile('blue','kept')}</div><div class="split-target sent">${pile('pink','sent')}</div></div>${person(2)}</div>`,text:'Player 1 chooses a whole number from 0 to 10 points to send to Player 2.'},
-        {scene:'send',title:'Player 1 keeps the rest',visual:`<div class="mechanic">${person(1)}${pile('blue','kept')}${pile('pink','sent')}${person(2)}</div>`,text:'Player 1 keeps the part of the 10-point endowment that is not sent.'},
-        {scene:'triple',title:'Player 2 receives three times the amount sent',visual:`<div class="mechanic">${pile('pink','sent')}<div class="operator">× 3</div>${triplePile('orange','received','move-right')}${person(2)}</div>`,text:'Player 2 receives three times the amount Player 1 sent.'},
-        {scene:'return',title:'Player 2 chooses an amount to return',visual:`<div class="mechanic return-mechanic">${person(1)}<div class="return-flow"><div class="return-moving">${pile('purple','returned')}</div><div class="return-received">${triplePile('orange','received')}</div></div>${person(2)}</div>`,text:'Player 2 chooses a whole-number amount to return, from 0 up to the amount Player 2 received.'},
-        {scene:'payoff',title:'Round payoff',visual:`<div class="payoff-grid"><div class="payoff-side"><div class="payoff-name">Player 1</div><div class="payoff-formula">${pile('blue','kept')}<div class="payoff-sign">+</div>${pile('purple','returned')}</div></div><div class="payoff-side"><div class="payoff-name">Player 2</div><div class="payoff-formula">${triplePile('orange','received')}<div class="payoff-sign">−</div>${pile('purple','returned')}</div></div></div>`,text:'Player 1 earns the points kept from the endowment plus the points returned.'},
-        {scene:'payoff',title:'Round payoff',visual:`<div class="payoff-grid"><div class="payoff-side"><div class="payoff-name">Player 1</div><div class="payoff-formula">${pile('blue','kept')}<div class="payoff-sign">+</div>${pile('purple','returned')}</div></div><div class="payoff-side"><div class="payoff-name">Player 2</div><div class="payoff-formula">${triplePile('orange','received')}<div class="payoff-sign">−</div>${pile('purple','returned')}</div></div></div>`,text:'Player 2 earns the points received minus the points returned.'},
-        {scene:'ready',title:'Ready for the understanding test',visual:'<div><div class="ready">Part 1 rules complete</div></div>',text:'Select “Start understanding test” when you are ready.'}
+        {scene:'flow',title:'Sending and returning',visual:`<div class="mechanic send-mechanic">${person(1)}<div class="split-area"><div class="split-origin">${tenPile('blue','10 points')}</div><div class="split-target kept">${pile('blue','kept')}</div><div class="split-target sent">${pile('pink','sent')}</div></div>${person(2)}</div>`,text:'Player 1 chooses a whole number from 0 to 10 points to send to Player 2.<br>Player 1 keeps the part of the 10-point endowment that is not sent.<br>Player 2 receives <span class="hl-yellow">three times</span> the amount Player 1 sent.<br>Player 2 chooses a whole-number amount to return to Player 1, from 0 up to the amount Player 2 received.'},
+        {scene:'payoff',title:'Round payoff',visual:`<div class="payoff-grid"><div class="payoff-card">${person(1)}<div class="payoff-caption">kept <span class="cap-sign">+</span> returned</div></div><div class="payoff-card">${person(2)}<div class="payoff-caption">received <span class="cap-sign">−</span> returned</div></div></div>`,text:'Player 1\u2019s round payoff = points kept + points returned.<br>Player 2\u2019s round payoff = points received \u2212 points returned.'},
+        {scene:'ready',title:'Ready for the understanding test',visual:'<div><div class="ready">Part 1 rules complete</div></div>',text:'Before Part 1 starts, you need to pass the understanding test of the Part 1 game rules.'}
     ];
     const title=document.getElementById('p1Title'),count=document.getElementById('p1Count'),visual=document.getElementById('p1Visual'),settled=document.getElementById('settledLines'),active=document.getElementById('activeSentence'),previous=document.getElementById('p1Previous'),next=document.getElementById('p1Next'),nativeNext=document.querySelector('#nativeNext button');
     let index=0,timer=null,settledCurrent=false,lineIndex=0,currentLines=[];
@@ -77,14 +79,14 @@
         const lines=stepLines();
         active.className='active-sentence';
         if(steps[index].scene==='setup'&&lineIndex===lines.length-1)active.classList.add('setup-last');
-        active.textContent=lines[lineIndex];
+        active.innerHTML=lines[lineIndex];
         void active.offsetWidth;
         requestAnimationFrame(()=>active.classList.add('show'));
         timer=setTimeout(finishSentence,readingTime(lines[lineIndex]));
     }
     function finishSentence(){
         const dock=document.querySelector('.sentence-dock');
-        active.style.top=`${dock.offsetTop+30+lineIndex*38}px`;
+        active.style.top=`${dock.offsetTop+42+lineIndex*55}px`;
         active.classList.add('drop');
         timer=setTimeout(()=>{
             currentLines.push(stepLines()[lineIndex]);
@@ -98,12 +100,13 @@
                 return;
             }
             settledCurrent=true;
+            if(steps[index].scene==='payoff')document.querySelector('.p1-stage').classList.add('with-visual');
             next.disabled=false;
             previous.disabled=index===0;
         },760)
     }
     function readingTime(text){return Math.min(11000,Math.max(4600,2500+text.replace(/<[^>]+>/g,'').length*42))}
-    function render(animate=true){clearTimeout(timer);const s=steps[index];settledCurrent=!animate;lineIndex=0;currentLines=[];title.textContent=s.title;count.textContent=`Instruction ${index+1} of ${steps.length}`;visual.innerHTML=s.visual;previous.disabled=animate||index===0;next.disabled=animate;next.textContent=index===steps.length-1?'Start understanding test':'Next';active.className='active-sentence';active.style.top='';active.textContent='';setHistory(animate?historyBefore(index):historyThrough(index));if(!animate)return;showNextLine()}
+    function render(animate=true){clearTimeout(timer);const s=steps[index];document.querySelector('.p1-stage').classList.toggle('with-visual',s.scene==='payoff'&&!animate);document.getElementById('part1Instructions').classList.toggle('center-controls',s.scene==='ready');settledCurrent=!animate;lineIndex=0;currentLines=[];title.textContent=s.title;count.textContent=`Instruction ${index+1} of ${steps.length}`;visual.innerHTML=s.visual;previous.disabled=animate||index===0;next.disabled=animate;next.textContent=index===steps.length-1?'Start understanding test':'Next';active.className='active-sentence';active.style.top='';active.textContent='';setHistory(animate?historyBefore(index):historyThrough(index));if(!animate)return;showNextLine()}
     previous.addEventListener('click',()=>{if(!settledCurrent||index===0)return;index-=1;render(false)});
     next.addEventListener('click',()=>{if(!settledCurrent)return;if(index===steps.length-1){nativeNext.click();return}index+=1;render(true)});
     render(true);

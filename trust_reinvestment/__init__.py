@@ -21,7 +21,8 @@ class C(BaseConstants):
     # starts and applies to every pair in the session. Participants are told
     # only that the computer decides the number of rounds; they never learn
     # the draw in advance.
-    STAGE2_MAX_ROUNDS = 7
+    STAGE2_MAX_ROUNDS = 6
+    STAGE2_STOP_PROBABILITY = 0.25
     NUM_ROUNDS = STAGE1_ROUNDS + STAGE2_MAX_ROUNDS
 
     ENDOWMENT = cu(10)
@@ -47,8 +48,8 @@ class C(BaseConstants):
     NOISE_WEIGHTS = [0.2, 0.6, 0.2]
 
     # Both parts use the same exchange rate.
-    PART1_USD_PER_POINT = 0.10
-    PART2_USD_PER_POINT = 0.10
+    PART1_USD_PER_POINT = 0.05
+    PART2_USD_PER_POINT = 0.05
 
 
 class Subsession(BaseSubsession):
@@ -106,67 +107,56 @@ class Player(BasePlayer):
         label="Suppose you are Player 1. How many points will you send?",
         choices=[[i, str(i)] for i in range(0, 11)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_1 = models.CurrencyField(
         label="Return if Player 1 sends 1 point",
         choices=[[i, str(i)] for i in range(0, 4)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_2 = models.CurrencyField(
         label="Return if Player 1 sends 2 points",
         choices=[[i, str(i)] for i in range(0, 7)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_3 = models.CurrencyField(
         label="Return if Player 1 sends 3 points",
         choices=[[i, str(i)] for i in range(0, 10)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_4 = models.CurrencyField(
         label="Return if Player 1 sends 4 points",
         choices=[[i, str(i)] for i in range(0, 13)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_5 = models.CurrencyField(
         label="Return if Player 1 sends 5 points",
         choices=[[i, str(i)] for i in range(0, 16)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_6 = models.CurrencyField(
         label="Return if Player 1 sends 6 points",
         choices=[[i, str(i)] for i in range(0, 19)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_7 = models.CurrencyField(
         label="Return if Player 1 sends 7 points",
         choices=[[i, str(i)] for i in range(0, 22)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_8 = models.CurrencyField(
         label="Return if Player 1 sends 8 points",
         choices=[[i, str(i)] for i in range(0, 25)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_9 = models.CurrencyField(
         label="Return if Player 1 sends 9 points",
         choices=[[i, str(i)] for i in range(0, 28)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_return_10 = models.CurrencyField(
         label="Return if Player 1 sends 10 points",
         choices=[[i, str(i)] for i in range(0, 31)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     part1_payoff_role = models.StringField(blank=True)
     part1_realized_offer = models.CurrencyField(initial=0)
@@ -178,8 +168,8 @@ class Player(BasePlayer):
     matched_pair_type = models.StringField(blank=True)
 
     transfer = models.CurrencyField(label="Amount to send", min=0)
-    amount_sent = models.CurrencyField(label="Whole number of points to send", min=0, blank=True)
-    intended_return = models.CurrencyField(label="Whole number of points to return", min=0, blank=True)
+    amount_sent = models.CurrencyField(label="Whole number of points to send", min=0)
+    intended_return = models.CurrencyField(label="Whole number of points to return", min=0)
     realized_return = models.CurrencyField(initial=0)
     noise_factor = models.FloatField(blank=True)
 
@@ -196,12 +186,12 @@ class Player(BasePlayer):
     round_payoff = models.CurrencyField(initial=0)
 
     belief_partner_intended_return = models.CurrencyField(
-        label="What is your belief about how many points player 2 will choose to return this round?",
+        label="How many points do you think Player 2 will choose to return this round?",
         min=0,
         blank=True,
     )
     belief_partner_transfer = models.CurrencyField(
-        label="What is your belief about how many points player 1 sent this round, before multiplication?",
+        label="How many points do you think Player 1 will send to you this round, before multiplication?",
         min=0,
         blank=True,
     )
@@ -214,7 +204,6 @@ class Player(BasePlayer):
         label="To what extent did the amount that reached you reflect player 2's chosen return rather than the computer adjustment? (1 - entirely the computer adjustment, 10 - entirely player 2's choice)",
         choices=[[i, str(i)] for i in range(1, 11)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
 
     gender = models.StringField(
@@ -237,19 +226,31 @@ class Player(BasePlayer):
         label="How willing are you to take risks in general? (1 - Not at all willing, 7 - Very willing)",
         choices=[[i, str(i)] for i in range(1, 8)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     trust_most_people = models.IntegerField(
         label="Generally speaking, would you say that most people can be trusted, or that you need to be very careful in dealing with people? (1 - Need to be very careful, 7 - Most people can be trusted)",
         choices=[[i, str(i)] for i in range(1, 8)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
     )
     trust_willingness = models.IntegerField(
         label="In general, how willing are you personally to trust other people? (1 - Not at all willing, 7 - Completely willing)",
         choices=[[i, str(i)] for i in range(1, 8)],
         widget=widgets.RadioSelectHorizontal,
-        blank=True,
+    )
+    self_trustworthy = models.IntegerField(
+        label="In general, how trustworthy do you consider yourself to be? (1 - Not at all trustworthy, 7 - Completely trustworthy)",
+        choices=[[i, str(i)] for i in range(1, 8)],
+        widget=widgets.RadioSelectHorizontal,
+    )
+    partner_trustworthy = models.IntegerField(
+        label="Think about the participant you were matched with: how trustworthy was Player 2's behavior in this game? (1 - Not at all trustworthy, 7 - Completely trustworthy)",
+        choices=[[i, str(i)] for i in range(1, 8)],
+        widget=widgets.RadioSelectHorizontal,
+    )
+    partner_trusting = models.IntegerField(
+        label="Think about the participant you were matched with: how trusting was Player 1's behavior in this game? (1 - Not at all trusting, 7 - Completely trusting)",
+        choices=[[i, str(i)] for i in range(1, 8)],
+        widget=widgets.RadioSelectHorizontal,
     )
     part1_quiz_p1_multiplied = models.IntegerField(
         label="1. How many points does Player 2 receive?",
@@ -348,6 +349,16 @@ def part2_quiz_p2_realized_return_choices(player: Player):
     return REALIZED_RETURN_CHOICES
 
 
+def draw_stage2_total_rounds():
+    """Session-wide Part 2 length: guaranteed STAGE2_MIN_ROUNDS rounds, then the
+    game ends with probability STAGE2_STOP_PROBABILITY after each round, with a
+    hard cap at STAGE2_MAX_ROUNDS."""
+    total = C.STAGE2_MIN_ROUNDS
+    while total < C.STAGE2_MAX_ROUNDS and random.random() >= C.STAGE2_STOP_PROBABILITY:
+        total += 1
+    return total
+
+
 def creating_session(subsession: Subsession):
     if subsession.round_number == 1:
         # Placeholder groups are needed while everyone completes both Part 1
@@ -361,7 +372,7 @@ def creating_session(subsession: Subsession):
             subsession.session.vars["stage2_total_rounds"] = (
                 int(fixed)
                 if fixed is not None
-                else random.randint(C.STAGE2_MIN_ROUNDS, C.STAGE2_MAX_ROUNDS)
+                else draw_stage2_total_rounds()
             )
         for player in subsession.get_players():
             player.participant.vars["part1_account"] = 0
@@ -581,18 +592,14 @@ def assign_stage2_matching_and_treatments(subsession: Subsession):
             (C.REINVESTMENT, C.NO_NOISE),
             (C.REINVESTMENT, C.NOISE),
         ]
-        if len(matrix) % len(cells):
-            raise RuntimeError(
-                "Equal Part 2 cell sizes require the number of pairs to be "
-                "divisible by four."
-            )
-        pairs_per_cell = len(matrix) // len(cells)
+        # Cyclic allocation: pair 1 -> cell 1, pair 2 -> cell 2, ..., pair 5
+        # -> cell 1 again. Any even headcount works (under or over 24); every
+        # additional pair simply continues the cycle, so cells stay as
+        # balanced as possible at all session sizes.
         specs = [
-            (treatment, noise_treatment, "random")
-            for treatment, noise_treatment in cells
-            for _ in range(pairs_per_cell)
+            (cells[i % len(cells)][0], cells[i % len(cells)][1], "random")
+            for i in range(len(matrix))
         ]
-        random.shuffle(specs)
 
     subsession.set_group_matrix(matrix)
     for group, (treatment, noise_treatment, pair_type) in zip(subsession.get_groups(), specs):
@@ -726,9 +733,9 @@ class Introduction(Page):
         show_up_fee = float(player.session.config.get("participation_fee", 10.00))
         return dict(
             show_name_form=True,
-            part1_rate=f"¥{C.PART1_USD_PER_POINT:.2f}",
-            part2_rate=f"¥{C.PART2_USD_PER_POINT:.2f}",
-            show_up_fee=f"¥{show_up_fee:.2f}",
+            part1_rate=f"S${C.PART1_USD_PER_POINT:.2f}",
+            part2_rate=f"S${C.PART2_USD_PER_POINT:.2f}",
+            show_up_fee=f"S${show_up_fee:.2f}",
         )
 
     @staticmethod
@@ -878,9 +885,11 @@ def stage2_instructions_vars(player: Player):
         is_reinvestment=uses_account_in_part2(player),
         has_noise=has_noise_in_part2(player),
         min_rounds=C.STAGE2_MIN_ROUNDS,
+        max_rounds=C.STAGE2_MAX_ROUNDS,
+        stop_pct=int(C.STAGE2_STOP_PROBABILITY * 100),
         role_number=player.id_in_group,
-        part1_rate=f"¥{C.PART1_USD_PER_POINT:.2f}",
-        part2_rate=f"¥{C.PART2_USD_PER_POINT:.2f}",
+        part1_rate=f"S${C.PART1_USD_PER_POINT:.2f}",
+        part2_rate=f"S${C.PART2_USD_PER_POINT:.2f}",
     )
 
 
@@ -1075,6 +1084,7 @@ class Stage2RoundIntro(Page):
         return dict(
             stage2_round=round_number,
             is_first_stage2_round=round_number == 1,
+            account=participant_part2_account(player),
         )
 
 
@@ -1135,7 +1145,9 @@ class Stage2TransferBelief(Page):
             account=participant_part2_account(player),
             endowment=C.ENDOWMENT,
             max_send=max_send,
+            partner_account=participant_part2_account(player_a),
             is_reinvestment=uses_account_in_part2(player),
+            has_noise=has_noise_in_part2(player),
             stage2_round=stage2_round_number(player),
         )
 
@@ -1166,6 +1178,7 @@ class Stage2Return(Page):
             amount_sent=player.group.get_player_by_id(1).total_exposure,
             received_amount=player.received_amount,
             max_return=stage2_return_max(player),
+            no_return_choice=player.received_amount == 0,
             multiplier=C.MULTIPLIER,
             has_noise=has_noise_in_part2(player),
             stage2_round=stage2_round_number(player),
@@ -1260,13 +1273,25 @@ class SurveyIntro(Page):
 
 class Survey(Page):
     form_model = "player"
-    form_fields = [
-        "gender",
-        "age",
-        "risk_preference",
-        "trust_most_people",
-        "trust_willingness",
-    ]
+
+    @staticmethod
+    def get_form_fields(player: Player):
+        base = [
+            "gender",
+            "age",
+            "risk_preference",
+            "trust_most_people",
+            "trust_willingness",
+            "self_trustworthy",
+        ]
+        # Player 1 rates the partner's trustworthiness; Player 2 rates the
+        # partner's trustingness.
+        base.append("partner_trustworthy" if player.id_in_group == 1 else "partner_trusting")
+        return base
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        return dict(is_p1=player.id_in_group == 1)
 
     @staticmethod
     def is_displayed(player: Player):
@@ -1299,13 +1324,13 @@ class FinalResults(Page):
             part1_account=part1_account,
             part2_account=part2_account,
             total_payoff=total_payoff,
-            part1_rate=f"¥{C.PART1_USD_PER_POINT:.2f}",
-            part2_rate=f"¥{C.PART2_USD_PER_POINT:.2f}",
-            part1_payment_usd=f"¥{part1_payment:.2f}",
-            part2_payment_usd=f"¥{part2_payment:.2f}",
-            decision_payment_usd=f"¥{decision_payment:.2f}",
-            show_up_fee_usd=f"¥{show_up_fee:.2f}",
-            final_payment_usd=f"¥{decision_payment + show_up_fee:.2f}",
+            part1_rate=f"S${C.PART1_USD_PER_POINT:.2f}",
+            part2_rate=f"S${C.PART2_USD_PER_POINT:.2f}",
+            part1_payment_usd=f"S${part1_payment:.2f}",
+            part2_payment_usd=f"S${part2_payment:.2f}",
+            decision_payment_usd=f"S${decision_payment:.2f}",
+            show_up_fee_usd=f"S${show_up_fee:.2f}",
+            final_payment_usd=f"S${decision_payment + show_up_fee:.2f}",
         )
 
 

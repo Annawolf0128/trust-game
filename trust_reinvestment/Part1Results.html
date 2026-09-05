@@ -17,7 +17,8 @@
     .part1-result-row{display:flex;align-items:center;justify-content:space-between;gap:20px;border-radius:14px;background:#202930;padding:14px 18px}
     .part1-result-label{font-size:19px;font-weight:850;color:#cbd4db}.part1-result-value{font-size:25px;font-weight:950;color:var(--role-color);text-align:right}
     .part1-result-row.payoff{margin-top:5px;border:3px solid var(--yellow);background:#342f24}.part1-result-row.payoff .part1-result-label,.part1-result-row.payoff .part1-result-value{color:var(--yellow)}
-    .part1-result-note{margin:0 42px 22px;border-left:9px solid var(--yellow);border-radius:18px;background:#313d46;color:#f7f9fb;padding:18px 28px;text-align:center;font-size:22px;font-weight:900}
+    .part1-result-note{margin:16px 42px 6px;border-left:9px solid var(--yellow);border-radius:18px;background:#313d46;color:#f7f9fb;padding:20px 30px;text-align:center;font-size:25px;font-weight:900;line-height:1.6}
+    .role-p1{color:var(--blue)}.role-p2{color:var(--orange)}
     @keyframes assignedGlow{from{filter:drop-shadow(0 0 10px var(--yellow))}to{filter:drop-shadow(0 0 24px var(--yellow))}}
     @media(max-width:850px){.part1-result-stage{padding:22px!important}.part1-role-grid{grid-template-columns:1fr;gap:22px}.part1-role-card{min-height:430px}.part1-result-note{margin:0 20px 20px}}
 </style>
@@ -27,6 +28,7 @@
         <div class="response-title">Your Part 1 result</div>
         <div class="response-count">Recorded for payment</div>
     </div>
+    <div class="part1-result-note"><div>You are assigned role {{ if payoff_role == 'proposer' }}<strong class="role-p1">Player 1</strong>{{ else }}<strong class="role-p2">Player 2</strong>{{ endif }}.</div><div>Your Part 1 payoff is kept separate from your Part 2 account.</div></div>
     <div class="response-stage part1-result-stage">
         <div class="part1-role-grid">
             <section class="part1-role-card player-one{{ if payoff_role == 'proposer' }} assigned{{ endif }}">
@@ -34,9 +36,9 @@
                 <div class="part1-result-person" aria-hidden="true"></div>
                 <div class="part1-role-name">Player 1</div>
                 <div class="part1-result-list">
-                    <div class="part1-result-row"><span class="part1-result-label">Sent to Player 2</span><strong class="part1-result-value">{{ realized_offer }}</strong></div>
-                    <div class="part1-result-row"><span class="part1-result-label">Received back</span><strong class="part1-result-value">{{ realized_return }}</strong></div>
-                    <div class="part1-result-row payoff"><span class="part1-result-label">Payoff</span><strong class="part1-result-value">{{ proposer_earnings }}</strong></div>
+                    <div class="part1-result-row"><span class="part1-result-label">Sent to <span class="role-p2">Player 2</span></span><strong class="part1-result-value">{{ realized_offer }}</strong></div>
+                    <div class="part1-result-row"><span class="part1-result-label"><span class="role-p2">Player 2</span> returned</span><strong class="part1-result-value">{{ realized_return }}</strong></div>
+                    <div class="part1-result-row payoff"><span class="part1-result-label">{{ if payoff_role == 'proposer' }}Your payoff{{ else }}Payoff{{ endif }}</span><strong class="part1-result-value">{{ proposer_earnings }}</strong></div>
                 </div>
             </section>
             <section class="part1-role-card player-two{{ if payoff_role == 'responder' }} assigned{{ endif }}">
@@ -44,14 +46,13 @@
                 <div class="part1-result-person" aria-hidden="true"></div>
                 <div class="part1-role-name">Player 2</div>
                 <div class="part1-result-list">
-                    <div class="part1-result-row"><span class="part1-result-label">{{ if payoff_role == 'proposer' }}Received from you{{ else }}Received from Player 1{{ endif }}</span><strong class="part1-result-value">{{ received_amount }}</strong></div>
-                    <div class="part1-result-row"><span class="part1-result-label">{{ if payoff_role == 'proposer' }}Returned to you{{ else }}Returned to Player 1{{ endif }}</span><strong class="part1-result-value">{{ realized_return }}</strong></div>
-                    <div class="part1-result-row payoff"><span class="part1-result-label">Payoff</span><strong class="part1-result-value">{{ responder_earnings }}</strong></div>
+                    <div class="part1-result-row"><span class="part1-result-label">{{ if payoff_role == 'proposer' }}Received from you{{ else }}Received from <span class="role-p1">Player 1</span>{{ endif }}</span><strong class="part1-result-value">{{ received_amount }}</strong></div>
+                    <div class="part1-result-row"><span class="part1-result-label">{{ if payoff_role == 'proposer' }}Returned to you{{ else }}Returned to <span class="role-p1">Player 1</span>{{ endif }}</span><strong class="part1-result-value">{{ realized_return }}</strong></div>
+                    <div class="part1-result-row payoff"><span class="part1-result-label">{{ if payoff_role == 'responder' }}Your payoff{{ else }}Payoff{{ endif }}</span><strong class="part1-result-value">{{ responder_earnings }}</strong></div>
                 </div>
             </section>
         </div>
     </div>
-    <div class="part1-result-note">Your assigned role is highlighted. Your Part 1 payoff is kept separate from your Part 2 account.</div>
     <div class="response-actions">{{ next_button }}</div>
 </div>
 {{ endblock }}

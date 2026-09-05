@@ -20,10 +20,8 @@
             <div class="quiz-error-copy">Please review the questions marked below and try again.</div>
         </div>
         {{ endif }}
-        <div class="quiz-form-heading">
-            <div class="response-form-title">Answer all four questions</div>
-            <button type="button" class="quiz-review-button" data-rule-review-open="part2-p1-rule-review">Review game rules</button>
-        </div>
+        <div class="quiz-review-row"><button type="button" class="quiz-review-button" data-rule-review-open="part2-p1-rule-review">Review game rules</button><span class="quiz-review-hint">Forgot a rule? You can review the game rules at any time.</span></div>
+        <div class="quiz-form-heading"><div class="response-form-title">Answer all four questions</div></div>
         <div class="response-field blue"><div class="quiz-question-number">Question 1</div>{{ formfield 'part2_quiz_p1_account' }}</div>
         <div class="response-scenario">For the next question, suppose Player 2 chooses to return <strong>6 points</strong>.</div>
         <div class="response-field purple"><div class="quiz-question-number">Question 2</div>{{ formfield 'part2_quiz_p1_realized_return' }}</div>
@@ -39,7 +37,7 @@
             </div>
             <div class="rules-review-body">
                 <div class="rules-review-item">You remain <strong class="value-blue">Player 1</strong> and remain matched with the same participant throughout Part 2.</div>
-                <div class="rules-review-item">Part 2 lasts for at least 4 rounds. The total number of rounds is determined by the computer in advance and is not announced.</div>
+                <div class="rules-review-item">Part 2 lasts at least 4 rounds. From round 4 on, the game ends with a 25% chance after every round.</div>
                 <div class="rules-review-item">At the start of <strong class="value-yellow">every round</strong>, Player 1 receives a 10-point endowment. Player 2 receives no endowment.</div>
                 <div class="rules-review-item">Player 2 receives <strong class="value-yellow">three times</strong> the amount Player 1 sent.</div>
                 <div class="rules-review-item">Each round payoff is added to the accumulated Part 2 account. Your Part 2 payoff equals the final balance in that account.</div>

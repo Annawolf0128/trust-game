@@ -11,19 +11,45 @@
             <div class="response-line">Your Part 2 accumulated account is <strong class="value-green">{{ account }}</strong>.</div>
             <div class="response-line response-key-fact blue">Player 1 sent <strong class="value-blue">{{ amount_sent }}</strong> this round.</div>
             <div class="response-line response-key-fact orange">You received <strong class="value-orange">{{ received_amount }}</strong> this round.</div>
-            <div class="response-line">You can return a whole number from <strong class="value-purple">0 to {{ max_return }}</strong>.</div>
+            <div class="response-line response-key-fact purple">You can return a whole number from <strong class="value-purple">0 to {{ max_return }}</strong>.</div>
             {{ if has_noise }}
-                <div class="response-line">The computer may adjust the return before it reaches Player 1.</div>
-                <div class="response-line">The adjustment affects <strong class="value-blue">only Player 1's payoff</strong>, not your payoff or account.</div>
+                <div class="response-line">The computer may adjust the return before it reaches Player 1: <strong class="value-purple">×0 (20% chance), ×1 (60%), ×2 (20%)</strong>.</div>
             {{ endif }}
-            <div class="response-line">Your round payoff is <strong class="value-yellow">the amount received minus the amount returned</strong>.</div>
         </div>
     </div>
+    {{ if no_return_choice }}
+    <div class="response-form">
+        <div class="response-form-title">No points to return</div>
+        <div class="response-form-help">You received 0 points this round, so there is nothing to return — your return is automatically 0. Click Next to continue.</div>
+        <div style="display:none">{{ formfield 'intended_return' }}</div>
+        <div class="response-next">{{ next_button }}</div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded',function(){
+        var i=document.querySelector('[name=intended_return]');
+        if(i){i.value=0;}
+    });
+    </script>
+    {{ else }}
     <div class="response-form">
         <div class="response-form-title">Choose your return</div>
         <div class="response-form-help">Enter one whole number.</div>
         <div class="response-field orange">{{ formfield 'intended_return' }}</div>
         <div class="response-next">{{ next_button }}</div>
     </div>
+    {{ endif }}
 </div>
+<div class="acct-jar" title="Your accumulated Part 2 account">
+    <div class="acct-jar-icon"><div class="acct-jar-lid"></div><div class="acct-jar-body"><div class="acct-jar-fill"></div></div></div>
+    <div class="acct-jar-text"><div class="acct-jar-label">PART 2 ACCOUNT</div><div class="acct-jar-value">{{ account }}</div></div>
+</div>
+<style>
+.acct-jar{position:fixed;top:92px;right:22px;z-index:5000;display:flex;align-items:center;gap:12px;background:#1c242c;border:2px solid #3a4753;border-radius:16px;padding:10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.acct-jar-lid{width:18px;height:5px;background:#9fb0bd;border-radius:2px;margin:0 auto 2px}
+.acct-jar-body{width:26px;height:32px;margin:0 auto;border:2.5px solid #9fb0bd;border-radius:6px 6px 10px 10px;position:relative;overflow:hidden}
+.acct-jar-fill{position:absolute;left:0;right:0;bottom:0;height:62%;background:#61cf93;opacity:.85}
+.acct-jar-label{font-size:11px;font-weight:900;letter-spacing:.08em;color:#9fb0bd}
+.acct-jar-value{font-size:22px;font-weight:950;color:#61cf93;line-height:1.1}
+@media(max-width:850px){.acct-jar{top:auto;bottom:16px;right:12px;padding:8px 12px}}
+</style>
 {{ endblock }}

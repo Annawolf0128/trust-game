@@ -3,11 +3,11 @@
 <link rel="stylesheet" href="{{ static 'trust_reinvestment/part2_response.css' }}">
 <div class="response-shell">
     <div class="response-head"><div class="response-pill">PART 1</div><div class="response-title">Question 2: You as Player 2</div><div class="response-count">Question 2 of 2</div></div>
-    <div class="response-stage compact"><div class="response-lines"><div class="response-line">Suppose you are <strong class="value-orange">Player 2</strong>.</div><div class="response-line">For each possible amount Player 1 may send, click one button to choose a whole-number return.</div></div></div>
+    <div class="response-stage compact"><div class="response-lines"><div class="response-line">Suppose you are <strong class="value-orange">Player 2</strong>.</div><div class="response-line">For each possible amount Player 1 may send (for each row below), click one button to choose a whole-number return.</div></div></div>
     <div class="response-form no-entrance">
-        <div class="strategy-wrap"><table class="table strategy-table"><thead><tr><th>Player 1 sends</th><th>You receive</th><th>Your return</th></tr></thead><tbody>
+        <div class="strategy-wrap"><table class="table strategy-table"><thead><tr><th>If Player 1 sends</th><th>And you receive</th><th>Your return</th></tr></thead><tbody>
         <tr><td>0</td><td>0</td><td>0 (automatic)</td></tr>
-        <tr><td>1</td><td>2</td><td>{{ formfield 'part1_return_1' }}</td></tr><tr><td>2</td><td>4</td><td>{{ formfield 'part1_return_2' }}</td></tr><tr><td>3</td><td>6</td><td>{{ formfield 'part1_return_3' }}</td></tr><tr><td>4</td><td>8</td><td>{{ formfield 'part1_return_4' }}</td></tr><tr><td>5</td><td>10</td><td>{{ formfield 'part1_return_5' }}</td></tr><tr><td>6</td><td>12</td><td>{{ formfield 'part1_return_6' }}</td></tr><tr><td>7</td><td>14</td><td>{{ formfield 'part1_return_7' }}</td></tr><tr><td>8</td><td>16</td><td>{{ formfield 'part1_return_8' }}</td></tr><tr><td>9</td><td>18</td><td>{{ formfield 'part1_return_9' }}</td></tr><tr><td>10</td><td>20</td><td>{{ formfield 'part1_return_10' }}</td></tr>
+        <tr><td>1</td><td>3</td><td>{{ formfield 'part1_return_1' }}</td></tr><tr><td>2</td><td>6</td><td>{{ formfield 'part1_return_2' }}</td></tr><tr><td>3</td><td>9</td><td>{{ formfield 'part1_return_3' }}</td></tr><tr><td>4</td><td>12</td><td>{{ formfield 'part1_return_4' }}</td></tr><tr><td>5</td><td>15</td><td>{{ formfield 'part1_return_5' }}</td></tr><tr><td>6</td><td>18</td><td>{{ formfield 'part1_return_6' }}</td></tr><tr><td>7</td><td>21</td><td>{{ formfield 'part1_return_7' }}</td></tr><tr><td>8</td><td>24</td><td>{{ formfield 'part1_return_8' }}</td></tr><tr><td>9</td><td>27</td><td>{{ formfield 'part1_return_9' }}</td></tr><tr><td>10</td><td>30</td><td>{{ formfield 'part1_return_10' }}</td></tr>
         </tbody></table></div>
         <div class="response-next">{{ next_button }}</div>
     </div>

@@ -7,13 +7,25 @@
     </div>
     <div class="response-stage">
         <div class="response-lines">
-            <div class="response-line">Your role is <strong class="value-orange">Player 2</strong>.</div>
-            <div class="response-line">Your Part 2 accumulated account is <strong class="value-green">{{ account }}</strong>.</div>
-            {{ if is_reinvestment }}
-                <div class="response-line">Player 1 can send up to <strong class="value-blue">{{ max_send }}</strong> using this round's endowment and accumulated account.</div>
-            {{ else }}
-                <div class="response-line">Player 1 can send up to <strong class="value-blue">{{ max_send }}</strong> from this round's endowment.</div>
-            {{ endif }}
+            <div class="line-group">
+                <div class="response-line">Your role is <strong class="value-orange">Player 2</strong>.</div>
+                <div class="response-line">Your Part 2 accumulated account is <strong class="value-green">{{ account }}</strong>.</div>
+            </div>
+            <div class="line-group">
+                <div class="response-line">Player 1 receives an endowment of <strong class="value-blue">{{ endowment }}</strong> for this round.</div>
+                {{ if is_reinvestment }}
+                    <div class="response-line">Player 1 can send any whole number from <strong class="value-blue">0 to {{ max_send }}</strong> this round.</div>
+                {{ else }}
+                    <div class="response-line">Player 1 can send a whole number from <strong class="value-blue">0 to {{ max_send }}</strong>, from this round's endowment only.</div>
+                {{ endif }}
+            </div>
+            <div class="line-group">
+                <div class="response-line">You will receive <strong class="value-yellow">three times</strong> the amount Player 1 sends.</div>
+                <div class="response-line">You then choose a whole number to return to Player 1, from <strong class="value-purple">0 up to the amount you received</strong>.</div>
+                {{ if has_noise }}
+                    <div class="response-line">The computer then randomly adjusts the return that reaches Player 1:<br><strong class="value-purple">×0 (20% chance), ×1 (60%), ×2 (20%)</strong>.</div>
+                {{ endif }}
+            </div>
         </div>
     </div>
     <div class="response-form">
@@ -23,4 +35,17 @@
         <div class="response-next">{{ next_button }}</div>
     </div>
 </div>
+<div class="acct-jar" title="Your accumulated Part 2 account">
+    <div class="acct-jar-icon"><div class="acct-jar-lid"></div><div class="acct-jar-body"><div class="acct-jar-fill"></div></div></div>
+    <div class="acct-jar-text"><div class="acct-jar-label">PART 2 ACCOUNT</div><div class="acct-jar-value">{{ account }}</div></div>
+</div>
+<style>
+.acct-jar{position:fixed;top:92px;right:22px;z-index:5000;display:flex;align-items:center;gap:12px;background:#1c242c;border:2px solid #3a4753;border-radius:16px;padding:10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.acct-jar-lid{width:18px;height:5px;background:#9fb0bd;border-radius:2px;margin:0 auto 2px}
+.acct-jar-body{width:26px;height:32px;margin:0 auto;border:2.5px solid #9fb0bd;border-radius:6px 6px 10px 10px;position:relative;overflow:hidden}
+.acct-jar-fill{position:absolute;left:0;right:0;bottom:0;height:62%;background:#61cf93;opacity:.85}
+.acct-jar-label{font-size:11px;font-weight:900;letter-spacing:.08em;color:#9fb0bd}
+.acct-jar-value{font-size:22px;font-weight:950;color:#61cf93;line-height:1.1}
+@media(max-width:850px){.acct-jar{top:auto;bottom:16px;right:12px;padding:8px 12px}}
+</style>
 {{ endblock }}
